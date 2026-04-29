@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LithoHub — Geothermal Anomaly Detection</title>
+    <link rel="stylesheet" href="https://atlas.microsoft.com/Content/atlas.min.css" />
+    <script src="https://atlas.microsoft.com/sdk/javascript/mapcontrol/3/atlas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js" crossorigin="anonymous"></script>
+    <style>
+        :root {
+            --bg-primary: #0d1117;
+            --bg-secondary: #161b22;
+            --bg-tertiary: #21262d;
+            --accent-primary: #42f5b9;
+            --accent-primary-dark: #2dc894;
+            --accent-hover: #52ffcc;
+            --status-success: #2563eb;
+            --status-warning: #f59e0b;
+            --status-critical: #ef4444;
+            --text-primary: #e1e4e8;
+            --text-secondary: #8b949e;
+            --text-tertiary: #6e7681;
+            --border-subtle: #30363d;
+            --border-light: #21262d;
+            --spacing-xs: 4px;
+            --spacing-sm: 8px;
+            --spacing-md: 16px;
+            --spacing-lg: 24px;
+            --spacing-xl: 32px;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { width: 100%; height: 100%; overflow: hidden; }
+        body {
+            font-family: 'Open Sans', Arial, Helvetica, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-size: 30px;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+        }
+        .app-container { display: flex; width: 100%; height: 100%; flex-direction: row; }
+        .sidebar {
+            width: 200px;
+            background: var(--bg-secondary);
+            border-right: 1px solid var(--border-subtle);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: var(--spacing-lg) 0;
+            gap: var(--spacing-md);
+            flex-shrink: 0;
+            position: relative;
+            z-index: 100;
+        }
+        .sidebar-logo {
+            width: 100px;
+            height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-primary-dark) 100%);
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 32px;
+            color: var(--bg-primary);
+            margin-bottom: var(--spacing-sm);
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 16px rgba(66, 245, 185, 0.2);
+        }
+        .sidebar-logo:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(66, 245, 185, 0.3);
+        }
+        .sidebar-nav { display: flex; flex-direction: column; gap: var(--spacing-sm); flex: 1; }
+        .sidebar-item {
+            width: 100px;
+            height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: transparent;
+            border: 1px solid var(--border-light);
+            border-radius: 8px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 28px;
+            position: relative;
+            overflow: hidden;
+        }
+        .sidebar-item:hover {
+            color: var(--accent-primary);
+            border-color: var(--accent-primary);
+            background: rgba(66, 245, 185, 0.1);
+        }
+        .sidebar-item.active {
+            background: var(--accent-primary);
+            color: var(--bg-primary);
+            border-color: var(--accent-primary);
+        }
+        .sidebar-footer {
+            margin-top: auto;
+            padding-top: var(--spacing-lg);
+            border-top: 1px solid var(--border-subtle);
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-tertiary);
+            text-align: center;
+            width: 100%;
+            line-height: 1.4;
+        }
+        .map-container { flex: 1; display: flex; position: relative; background: var(--bg-primary); }
+        #map { width: 100%; height: 100%; position: absolute; top: 0; left: 0; }
+        .map-header {
+            position: absolute;
+            top: var(--spacing-lg);
+            left: var(--spacing-lg);
+            background: rgba(13, 17, 23, 0.95);
+            backdrop-filter: blur(12px);
+            padding: var(--spacing-md) var(--spacing-lg);
+            border-radius: 12px;
+            border: 1px solid var(--border-subtle);
+            z-index: 10;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            max-width: 380px;
+        }
+        .map-header h1 {
+            font-size: 22px;
+            font-weight: 600;
+            margin-bottom: var(--spacing-xs);
+            color: var(--text-primary);
+            letter-spacing: -0.5px;
+        }
+        .map-header p {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.4;
+        }
+        .live-status {
+            position: absolute;
+            bottom: var(--spacing-lg);
+            left: var(--spacing-lg);
+            background: rgba(13, 17, 23, 0.95);
+            backdrop-filter: blur(12px);
+            padding: var(--spacing-md) var(--spacing-lg);
+            border-radius: 8px;
+            border: 1px solid var(--border-subtle);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+            z-index: 10;
+            font-size: 48px;
+        }
+        .live-dot {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--status-success);
+            animation: pulse-dot 2s infinite;
+        }
+        @keyframes pulse-dot { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(0.9); } }
+        .live-text { display: flex; flex-direction: column; gap: 2px; }
+        .live-text strong { color: var(--text-primary); font-size: 12px; font-weight: 600; }
+        .live-text span { color: var(--text-secondary); font-size: 11px; }
+        .data-panel {
+            width: 400px;
+            background: var(--bg-secondary);
+            border-left: 1px solid var(--border-subtle);
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            overflow: hidden;
+            position: relative;
+            z-index: 20;
+            box-shadow: -2px 0 16px rgba(0, 0, 0, 0.3);
+        }
+        .panel-header {
+            padding: var(--spacing-lg);
+            border-bottom: 1px solid var(--border-subtle);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0;
+            background: linear-gradient(180deg, var(--bg-secondary) 0%, rgba(33, 38, 45, 0.5) 100%);
+        }
+        .panel-header h2 {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            letter-spacing: -0.3px;
+        }
+        .panel-header-subtitle {
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+        .close-panel {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: transparent;
+            border: 1px solid var(--border-light);
+            border-radius: 6px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 16px;
+        }
+        .close-panel:hover {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border-color: var(--accent-primary);
+        }
+        .panel-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: var(--spacing-lg);
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-lg);
+        }
+        .panel-content::-webkit-scrollbar { width: 6px; }
+        .panel-content::-webkit-scrollbar-track { background: transparent; }
+        .panel-content::-webkit-scrollbar-thumb { background: var(--border-subtle); border-radius: 3px; }
+        .panel-content::-webkit-scrollbar-thumb:hover { background: var(--accent-primary); }
+        .content-section { display: flex; flex-direction: column; gap: var(--spacing-md); }
+        .section-title {
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: var(--accent-primary);
+            margin-bottom: var(--spacing-xs);
+        }
+        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-sm); }
+        .info-item {
+            background: var(--bg-tertiary);
+            padding: var(--spacing-md);
+            border-radius: 8px;
+            border: 1px solid var(--border-light);
+            border-left: 3px solid var(--accent-primary);
+            transition: all 0.2s ease;
+        }
+        .info-item:hover {
+            background: rgba(66, 245, 185, 0.05);
+            border-color: var(--accent-primary);
+        }
+        .info-label {
+            font-size: 20px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+        .info-value {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-primary);
+            letter-spacing: -0.3px;
+        }
+        .anomaly-container {
+            background: var(--bg-tertiary);
+            border: 2px solid var(--border-light);
+            border-radius: 8px;
+            padding: var(--spacing-md);
+            transition: all 0.3s ease;
+        }
+        .anomaly-container.critical {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: var(--status-critical);
+        }
+        .anomaly-container.normal {
+            background: rgba(37, 99, 235, 0.1);
+            border-color: var(--status-success);
+        }
+        .anomaly-header {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            margin-bottom: var(--spacing-md);
+            padding-bottom: var(--spacing-md);
+            border-bottom: 1px solid var(--border-light);
+        }
+        .anomaly-header.critical { border-bottom-color: rgba(239, 68, 68, 0.3); }
+        .anomaly-header.normal { border-bottom-color: rgba(37, 99, 235, 0.3); }
+        .anomaly-icon { font-size: 18px; }
+        .anomaly-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        .anomaly-flag {
+            background: rgba(0, 0, 0, 0.2);
+            border-left: 3px solid var(--status-critical);
+            padding: var(--spacing-md);
+            margin-bottom: var(--spacing-sm);
+            border-radius: 4px;
+            font-size: 12px;
+        }
+        .anomaly-flag.normal { border-left-color: var(--status-success); }
+        .flag-metric {
+            font-weight: 600;
+            color: var(--accent-primary);
+            margin-bottom: 4px;
+            font-size: 12px;
+        }
+        .flag-detail {
+            color: var(--text-secondary);
+            font-size: 11px;
+            line-height: 1.4;
+            margin-top: 4px;
+        }
+        .recommendation {
+            background: rgba(66, 245, 185, 0.08);
+            border-left: 3px solid var(--accent-primary);
+            padding: var(--spacing-md);
+            border-radius: 4px;
+            margin-top: var(--spacing-sm);
+        }
+        .recommendation-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--accent-primary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+        .recommendation-text {
+            font-size: 12px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+        .sensor-grid { display: grid; grid-template-columns: 1fr; gap: var(--spacing-sm); }
+        .sensor-item {
+            background: var(--bg-tertiary);
+            padding: var(--spacing-md);
+            border-radius: 8px;
+            border: 1px solid var(--border-light);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s ease;
+        }
+        .sensor-item:hover {
+            background: rgba(66, 245, 185, 0.05);
+            border-color: var(--accent-primary);
+        }
+        .sensor-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .sensor-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--accent-primary);
+            letter-spacing: -0.5px;
+        }
+        .chart-wrapper {
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            border: 1px solid var(--border-light);
+            padding: var(--spacing-md);
+        }
+        .chart-tabs { display: flex; gap: var(--spacing-xs); margin-bottom: var(--spacing-md); }
+        .chart-tab {
+            flex: 1;
+            padding: var(--spacing-sm) var(--spacing-md);
+            background: transparent;
+            border: 1px solid var(--border-light);
+            border-radius: 4px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: all 0.2s ease;
+        }
+        .chart-tab:hover {
+            border-color: var(--accent-primary);
+            color: var(--accent-primary);
+            background: rgba(66, 245, 185, 0.1);
+        }
+        .chart-tab.active {
+            background: var(--accent-primary);
+            color: var(--bg-primary);
+            border-color: var(--accent-primary);
+        }
+        .chart-container { position: relative; height: 220px; }
+        .placeholder {
+            color: var(--text-secondary);
+            text-align: center;
+            padding: var(--spacing-xl);
+            font-style: italic;
+            font-size: 12px;
+        }
+        .app-footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 32px;
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border-subtle);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 var(--spacing-lg);
+            font-size: 11px;
+            color: var(--text-tertiary);
+            z-index: 50;
+        }
+        .footer-credits { display: flex; gap: var(--spacing-md); align-items: center; }
+        .footer-credits a {
+            color: var(--accent-primary);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        .footer-credits a:hover { color: var(--accent-hover); }
+        @media (max-width: 768px) {
+            .data-panel {
+                position: fixed;
+                right: 0;
+                top: 0;
+                bottom: 32px;
+                width: 350px;
+                transform: translateX(100%);
+                transition: transform 0.3s ease;
+                z-index: 200;
+            }
+            .data-panel.open { transform: translateX(0); }
+        }
+    </style>
+</head>
+<body>
+<div class="app-container">
+    <div class="sidebar">
+        <div class="sidebar-logo" title="LithoHub">🪨</div>
+        <nav class="sidebar-nav">
+            <button class="sidebar-item active" title="Map View" onclick="switchView('map')">🗺️</button>
+            <button class="sidebar-item" title="Assets" onclick="switchView('assets')">📊</button>
+            <button class="sidebar-item" title="Analytics" onclick="switchView('analytics')">📈</button>
+            <button class="sidebar-item" title="Layers" onclick="switchView('layers')">🔍</button>
+            <button class="sidebar-item" title="Settings" onclick="switchView('settings')">⚙️</button>
+        </nav>
+        <div class="sidebar-footer">v1.0<br>LithoHub</div>
+    </div>
+    <div class="map-container">
+        <div id="map"></div>
+        <div class="map-header">
+            <h1>LithoHub</h1>
+            <p>Geothermal anomaly detection · Real-time P/T monitoring for Indonesian energy operators</p>
+        </div>
+        <div class="live-status">
+            <div class="live-dot"></div>
+            <div class="live-text">
+                <strong>Excel Live Feed</strong>
+                <span>lithohub_assets.xlsx · auto-refresh 30s</span>
+            </div>
+        </div>
+    </div>
+    <div class="data-panel">
+        <div class="panel-header">
+            <div>
+                <h2 id="panelTitle">Select an Asset</h2>
+                <div class="panel-header-subtitle" id="panelSubtitle"></div>
+            </div>
+            <button class="close-panel" onclick="closePanel()">✕</button>
+        </div>
+        <div class="panel-content" id="panelContent">
+            <div class="placeholder">Click a marker on the map to view asset details</div>
+        </div>
+    </div>
+</div>
+<div class="app-footer">
+    <div class="footer-credits">
+        <span>LithoHub © 2026</span>
+        <a href="#" title="Data source">data/lithohub_assets.xlsx</a>
+        <span>•</span>
+        <span>Seequent · Geological Data Excellence</span>
+    </div>
+    <div id="footerStatus">Loading...</div>
+</div>
+<script>
+let map, dataSource, bubbleLayer;
+let selectedAsset = null;
+let assetsData = [];
+let activeMetric = 'whp';
+
+function initMap() {
+    map = new atlas.Map('map', {
+        center: [113.0, -1.5],
+        zoom: 4,
+        style: 'night',
+        authOptions: {
+            authType: atlas.AuthenticationType.subscriptionKey,
+            subscriptionKey: '8yVxYz9pur5VagwG7K45dpTjidlGI6bNWq2fPC8ah1JFIm1kf4EaJQQJ99CDACYeBjFkEY5HAAAgAZMP3iY3'
+        }
+    });
+
+    map.events.add('ready', function() {
+        dataSource = new atlas.source.DataSource();
+        map.sources.add(dataSource);
+        loadAssets(() => {
+            addMarkers();
+            startAutoRefresh();
+        });
+    });
+}
+
+function loadAssets(onDone) {
+    fetch('/api/assets')
+        .then(r => r.ok ? r.json() : Promise.reject('Server offline'))
+        .then(data => {
+            processAssets(data, 'Excel (live)', onDone);
+        })
+        .catch(() => {
+            fetch('data/assets.json')
+                .then(r => r.json())
+                .then(data => {
+                    processAssets(data, 'Static JSON (fallback)', onDone);
+                });
+        });
+}
+
+function processAssets(data, source, onDone) {
+    assetsData = Array.isArray(data) ? data : (data.assets || []);
+    assetsData = assetsData.filter(a => {
+        let lng = parseFloat(a.longitude);
+        let lat = parseFloat(a.latitude);
+        return !isNaN(lng) && !isNaN(lat);
+    });
+    assetsData.forEach(a => {
+        if (!a.computedAnomaly) {
+            a.computedAnomaly = computeAnomalies(a);
+        }
+    });
+    document.getElementById('footerStatus').textContent = `${assetsData.length} assets loaded · ${source}`;
+    if (onDone) onDone();
+}
+
+function addMarkers() {
+    dataSource.clear();
+    assetsData.forEach(asset => {
+        let lng = parseFloat(asset.longitude);
+        let lat = parseFloat(asset.latitude);
+        if (isNaN(lng) || isNaN(lat)) return;
+        let anomType = (asset.computedAnomaly && asset.computedAnomaly.anomalyType) || 'none';
+        dataSource.add(new atlas.data.Feature(
+            new atlas.data.Point([lng, lat]),
+            { id: asset.id, name: asset.name, type: asset.type, anomalyType: anomType }
+        ));
+    });
+
+    if (!bubbleLayer) {
+        bubbleLayer = new atlas.layer.BubbleLayer(dataSource, 'bubble-layer', {
+            radius: 12,
+            fillColor: ['match', ['get','anomalyType'], 'none', '#2563eb', '#ef4444'],
+            fillOpacity: 0.85,
+            strokeColor: '#fff',
+            strokeWidth: 2
+        });
+        map.layers.add(bubbleLayer);
+        map.events.add('click', bubbleLayer, onMarkerClick);
+        map.events.add('mouseover', bubbleLayer, () => {
+            map.getCanvasContainer().style.cursor = 'pointer';
+        });
+        map.events.add('mouseout', bubbleLayer, () => {
+            map.getCanvasContainer().style.cursor = '';
+        });
+    }
+}
+
+function onMarkerClick(e) {
+    if (!e.shapes || !e.shapes.length) return;
+    let props = e.shapes[0].getProperties();
+    selectedAsset = assetsData.find(a => a.id === props.id);
+    if (selectedAsset) {
+        updatePanel();
+        map.setCamera({ center: [selectedAsset.longitude, selectedAsset.latitude], zoom: 6 });
+    }
+}
+
+function updatePanel() {
+    if (!selectedAsset) return;
+    document.getElementById('panelTitle').textContent = selectedAsset.name;
+    document.getElementById('panelSubtitle').textContent = `${selectedAsset.type} · ${selectedAsset.location}`;
+
+    let html = `
+        <div class="content-section">
+            <div class="section-title">Asset Details</div>
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-label">Type</div>
+                    <div class="info-value">${selectedAsset.type}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Depth</div>
+                    <div class="info-value">${selectedAsset.depth} m</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Rock Type</div>
+                    <div class="info-value">${selectedAsset.rockType}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Status</div>
+                    <div class="info-value" style="color: #2563eb;">● Active</div>
+                </div>
+            </div>
+        </div>
+    `;
+
+    let anomaly = selectedAsset.computedAnomaly || computeAnomalies(selectedAsset);
+    let isAnom = anomaly.hasAnomaly;
+    html += `
+        <div class="content-section">
+            <div class="section-title">Anomaly Status</div>
+            <div class="anomaly-container ${isAnom ? 'critical' : 'normal'}">
+                <div class="anomaly-header ${isAnom ? 'critical' : 'normal'}">
+                    <div class="anomaly-icon">${isAnom ? '⚠️' : '✓'}</div>
+                    <div class="anomaly-title">${isAnom ? 'Anomaly Detected' : 'All Normal'}</div>
+                </div>
+                ${isAnom ? `
+                    ${anomaly.anomalyFlags.map(flag => `
+                        <div class="anomaly-flag critical">
+                            <div class="flag-metric">${flag.metric}</div>
+                            <div class="flag-detail">${flag.interpretation}</div>
+                            <div class="flag-detail" style="color: var(--accent-primary); margin-top: 6px;">
+                                ${flag.value} (baseline: ${flag.baseline})
+                            </div>
+                        </div>
+                    `).join('')}
+                    <div class="recommendation">
+                        <div class="recommendation-label">💡 Recommended Action</div>
+                        <div class="recommendation-text">${anomaly.recommendation}</div>
+                    </div>
+                ` : `
+                    <div class="flag-detail">All parameters within expected baseline ranges.</div>
+                `}
+            </div>
+        </div>
+    `;
+
+    html += `
+        <div class="content-section">
+            <div class="section-title">Live Sensor Readings</div>
+            <div class="sensor-grid">
+                <div class="sensor-item">
+                    <div class="sensor-label">Temperature</div>
+                    <div class="sensor-value">${selectedAsset.currentTemp}°C</div>
+                </div>
+                <div class="sensor-item">
+                    <div class="sensor-label">Wellhead Pressure</div>
+                    <div class="sensor-value">${selectedAsset.currentWHP} PSI</div>
+                </div>
+                <div class="sensor-item">
+                    <div class="sensor-label">Pressure</div>
+                    <div class="sensor-value">${selectedAsset.currentPressure} PSI</div>
+                </div>
+            </div>
+        </div>
+    `;
+
+    if (selectedAsset.historicalData) {
+        html += `
+            <div class="content-section">
+                <div class="section-title">90-Day Trend</div>
+                <div class="chart-wrapper">
+                    <div class="chart-tabs">
+                        <button class="chart-tab active" onclick="switchChart('whp', this)">WHP</button>
+                        <button class="chart-tab" onclick="switchChart('temp', this)">Temp</button>
+                        <button class="chart-tab" onclick="switchChart('chl', this)">Chloride</button>
+                    </div>
+                    <div class="chart-container" id="chartContainer"></div>
+                </div>
+            </div>
+        `;
+    }
+
+    document.getElementById('panelContent').innerHTML = html;
+    renderChart('whp');
+}
+
+function switchChart(metric, btn) {
+    activeMetric = metric;
+    document.querySelectorAll('.chart-tab').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderChart(metric);
+}
+
+function renderChart(metric) {
+    if (!selectedAsset || !selectedAsset.historicalData) return;
+    let hist = selectedAsset.historicalData;
+    let configs = {
+        whp: { data: hist.whp, label: 'Wellhead Pressure (PSI)', color: '#42f5b9' },
+        temp: { data: hist.temperature, label: 'Temperature (°C)', color: '#f59e0b' },
+        chl: { data: hist.chemistry_chlorides, label: 'Chloride (ppm)', color: '#2563eb' }
+    };
+    let cfg = configs[metric];
+    if (!cfg || !cfg.data) return;
+    let meanVal = cfg.data.reduce((a,b) => a+b) / cfg.data.length;
+    let container = document.getElementById('chartContainer');
+    let canvas = document.createElement('canvas');
+    container.innerHTML = '';
+    container.appendChild(canvas);
+
+    new Chart(canvas, {
+        type: 'line',
+        data: {
+            labels: hist.days.map(d => 'D' + d),
+            datasets: [
+                {
+                    label: cfg.label,
+                    data: cfg.data,
+                    borderColor: cfg.color,
+                    backgroundColor: cfg.color + '18',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.3,
+                    pointRadius: 2,
+                    pointHoverRadius: 4,
+                    pointBackgroundColor: cfg.color
+                },
+                {
+                    label: 'Baseline',
+                    data: Array(cfg.data.length).fill(parseFloat(meanVal.toFixed(2))),
+                    borderColor: '#1f8b97',
+                    borderWidth: 1.5,
+                    borderDash: [5,5],
+                    fill: false,
+                    pointRadius: 0
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    labels: { color: '#8b949e', font: { size: 10 } }
+                }
+            },
+            scales: {
+                y: {
+                    ticks: { color: '#6e7681', font: { size: 10 } },
+                    grid: { color: '#21262d' }
+                },
+                x: {
+                    ticks: { color: '#6e7681', font: { size: 9 }, maxTicksLimit: 8 },
+                    grid: { color: '#21262d' }
+                }
+            }
+        }
+    });
+}
+
+function computeAnomalies(asset) {
+    let result = {
+        hasAnomaly: false,
+        anomalyFlags: [],
+        anomalyType: 'none',
+        summary: 'No anomalies detected',
+        recommendation: 'Continue routine monitoring'
+    };
+
+    if (!asset.historicalData) return result;
+    let hist = asset.historicalData;
+    let SIGMA = 1.5;
+
+    if (hist.whp && hist.whp.length > 0) {
+        let wMean = mean(hist.whp);
+        let wStd = std(hist.whp, wMean);
+        let wDev = Math.abs(asset.currentWHP - wMean) / (wStd + 0.001);
+
+        if (wDev > SIGMA) {
+            let pct = ((asset.currentWHP - wMean) / wMean * 100).toFixed(1);
+            result.anomalyFlags.push({
+                metric: 'Wellhead Pressure',
+                deviation: wDev.toFixed(2),
+                value: asset.currentWHP,
+                baseline: wMean.toFixed(1),
+                percentChange: pct,
+                interpretation: `WHP dropped ${Math.abs(pct)}% — possible scale blockage or reservoir depletion`
+            });
+            result.hasAnomaly = true;
+            result.anomalyType = 'pressure_drop';
+            result.recommendation = 'Run caliper log; check for mineral scaling; compare reservoir pressure history';
+        }
+    }
+
+    if (hist.temperature && hist.temperature.length > 0) {
+        let tMean = mean(hist.temperature);
+        let tStd = std(hist.temperature, tMean);
+        let tDev = Math.abs(asset.currentTemp - tMean) / (tStd + 0.001);
+
+        if (tDev > SIGMA) {
+            let pct = ((asset.currentTemp - tMean) / tMean * 100).toFixed(1);
+            result.anomalyFlags.push({
+                metric: 'Temperature',
+                deviation: tDev.toFixed(2),
+                value: asset.currentTemp,
+                baseline: tMean.toFixed(1),
+                percentChange: pct,
+                interpretation: `Temperature kink detected — inspect for corrosion or partial blockage`
+            });
+            result.hasAnomaly = true;
+            if (result.anomalyType === 'none') result.anomalyType = 'temperature_kink';
+            result.recommendation = 'Inspect casing integrity; check for internal scaling or corrosion';
+        }
+    }
+
+    if (hist.chemistry_chlorides && hist.chemistry_chlorides.length >= 20) {
+        let earlyBase = mean(hist.chemistry_chlorides.slice(0, 20));
+        let recent = hist.chemistry_chlorides[hist.chemistry_chlorides.length - 1];
+        let pct = ((recent - earlyBase) / earlyBase) * 100;
+
+        if (pct > 20) {
+            result.anomalyFlags.push({
+                metric: 'Chloride Concentration',
+                deviation: (pct / 10).toFixed(2),
+                value: recent + ' ppm',
+                baseline: earlyBase.toFixed(0) + ' ppm',
+                percentChange: pct.toFixed(1),
+                interpretation: `Chlorides ${pct.toFixed(0)}% above baseline — potential casing failure or cold water infiltration`
+            });
+            result.hasAnomaly = true;
+            if (result.anomalyType === 'none') result.anomalyType = 'chemistry_spike';
+            result.recommendation = 'Test casing integrity immediately; run mechanical integrity test (MIT)';
+        }
+    }
+
+    return result;
+}
+
+function mean(arr) { return arr.reduce((a,b) => a+b) / arr.length; }
+function std(arr, m) { return Math.sqrt(arr.reduce((s,v) => s + Math.pow(v-m, 2)) / arr.length); }
+function closePanel() {
+    selectedAsset = null;
+    document.getElementById('panelContent').innerHTML = '<div class="placeholder">Click a marker on the map to view asset details</div>';
+    document.getElementById('panelTitle').textContent = 'Select an Asset';
+    document.getElementById('panelSubtitle').textContent = '';
+}
+function switchView(view) {
+    console.log('View:', view);
+}
+function startAutoRefresh() {
+    setInterval(() => loadAssets(), 30000);
+}
+
+window.addEventListener('load', initMap);
+</script>
+</body>
+</html>
