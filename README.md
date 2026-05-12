@@ -90,8 +90,7 @@ Each anomaly includes:
 - Tarakan Basin Gas Well (chemistry shift flagged)
 - Trans Sumatra Pipeline, Barito Processing Facility (mixed asset types)
 
-```
-
+---
 ### **Why Not Machine Learning?**
 
 Geothermal operators work in heavily regulated environments (Ministry of ESDM oversight). Black-box ML models (neural networks, ensemble classifiers) cannot be audited by regulators. A chloride spike flagged by a statistical model can be explained to inspectors; a neural network's prediction cannot.
