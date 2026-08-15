@@ -143,5 +143,71 @@
       "temperature": [120,120,120,120,120,120,120,120,120,120,120,120,120,120,120,120,120,120,120,120,120,120,120,120,120,120,120,120,120,120,120,120,120,120,120,120,120,120,120,120,120,120,120,120,120,120],
       "chemistry_chlorides": [170,171,170,172,170,171,170,172,171,170,172,170,171,170,172,171,170,172,171,170,172,171,170,172,170,171,172,170,171,170,172,171,170,172,171,170,172,171,170,172,195,221,248,272,296,315]
     }
-  }
+  },
+  {
+  "id": "well-004",
+  "name": "Salak Geothermal Well #1",
+  "type": "Geothermal Well",
+  "latitude": -6.73,
+  "longitude": 106.72,
+  "depth": 1561,
+  "status": "active",
+  "location": "East Awibengkok Sector, Gunung Salak Field, West Java",
+  "operatingSince": "2002-12",
+  "rockType": null,
+  "subsidenceRisk": null,
+  "currentTemp": null,
+  "currentPressure": null,
+  "currentWHP": null,
+  "vibration": null,
+  "anomalyType": "production_decline",
+  "anomalyDescription": "Decline rate escalated from an 8% baseline to 23% (production interference, early 2005) then 237% (silica scale blockage, late 2006). Confirmed via sinker bar survey; recovered scale sample was 80% amorphous silica at 3730 ft-md. Resolved via mechanical workover, June 2007.",
+  "anomalyDepth": 1137,
+  "baselineWHP": null,
+  "baselineTemp": null,
+  "baselinePressure": null,
+  "historicalData": null,
+  "productionHistory": {
+    "metric": "steam_rate_kph",
+    "unitNote": "Steam rate in kilo-pounds per hour (kph); decline rate in percent per year",
+    "points": [
+      {
+        "date": "2002-12",
+        "steamRateKph": 280,
+        "declineRatePercent": 8,
+        "eventLabel": "Well completed — baseline established",
+        "eventDescription": "Well #1 completed at TD 5120 ft-md in the East Awibengkok steam cap reservoir. Initial production 280 kph at a normal decline rate of 8%. This is the well's baseline."
+      },
+      {
+        "date": "2005-early",
+        "steamRateKph": null,
+        "declineRatePercent": 23,
+        "eventLabel": "Production interference",
+        "eventDescription": "Decline rate rose to 23%. A new production well was drilled into the same reservoir sector and a neighboring well converted from two-phase to dry steam, increasing total field extraction from the East Salak steam cap."
+      },
+      {
+        "date": "2006-late",
+        "steamRateKph": 190,
+        "declineRatePercent": null,
+        "eventLabel": "Pre-blockage level",
+        "eventDescription": "Steam rate still at 190 kph, the level immediately before the sharp drop described below."
+      },
+      {
+        "date": "2006-late",
+        "steamRateKph": 90,
+        "declineRatePercent": 237,
+        "eventLabel": "Silica scale blockage confirmed",
+        "eventDescription": "Steam rate dropped from 190 to 90 kph with no change in neighboring wells' extraction rate. Sinker bar survey (2.25\" tool) found a blockage at 3730 ft-md; recovered scale sample was 80% amorphous silica by petrographic analysis."
+      },
+      {
+        "date": "2007-06",
+        "steamRateKph": 190,
+        "declineRatePercent": null,
+        "eventLabel": "Workover recovery",
+        "eventDescription": "Mechanical clean-out of scale performed. Production recovered to a level consistent with the well's hydraulic model, confirming the decline was caused exclusively by wellbore scale, not formation-level damage."
+      }
+    ]
+  },
+  "source": "Libert, F. and Pasikki, R. (2010). Identifying Important Reservoir Characteristics Using Calibrated Wellbore Hydraulic Models in the Salak Geothermal Field, Indonesia. Proceedings World Geothermal Congress 2010, Bali."
+}
 ]
