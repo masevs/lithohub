@@ -844,7 +844,38 @@ function renderDeclineChart() {
         recommendation: 'Continue routine monitoring'
     };
 
-    if (!asset.historicalData) return result;
+    // Decline rate anomaly (production history data, e.g. Salak Well #1)
+    if (asset.productionHistory && asset.productionHistory.points) {
+        let points = asset.productionHistory.points.filter(p => p.declineRatePercent != null);
+        if (points.length > 0) {
+            let baseline = points[0].declineRatePercent;
+            let latestPoint = points[points.length - 1];
+            let latest = latestPoint.declineRatePercent;
+            let ratio = latest / baseline;
+            let ppIncrease = latest - baseline;
+
+            const RATIO_CRITICAL = 2, PP_CRITICAL = 10;
+            const RATIO_WARNING = 1.5, PP_WARNING = 5;
+
+            if (ratio >= RATIO_WARNING || ppIncrease >= PP_WARNING) {
+                let isCritical = ratio >= RATIO_CRITICAL || ppIncrease >= PP_CRITICAL;
+                result.anomalyFlags.push({
+                    metric: 'Decline Rate',
+                    deviation: ratio.toFixed(1) + 'x baseline',
+                    value: latest + '%',
+                    baseline: baseline + '%',
+                    percentChange: ppIncrease.toFixed(1),
+                    interpretation: `${latestPoint.eventLabel}: ${latestPoint.eventDescription}`
+                });
+                result.hasAnomaly = true;
+                if (result.anomalyType === 'none') result.anomalyType = 'production_decline';
+                result.recommendation = isCritical
+                    ? 'Schedule workover evaluation (e.g. caliper log, mechanical clean-out)'
+                    : 'Continue monitoring; investigate contributing wells or reservoir changes';
+            }
+        }
+    }
+        if (!asset.historicalData) return result;
     let hist = asset.historicalData;
     let SIGMA = 1.5;
 
@@ -909,37 +940,7 @@ function renderDeclineChart() {
             result.recommendation = 'Test casing integrity immediately; run mechanical integrity test (MIT)';
         }
     }
-// Decline rate anomaly (production history data, e.g. Salak Well #1)
-    if (asset.productionHistory && asset.productionHistory.points) {
-        let points = asset.productionHistory.points.filter(p => p.declineRatePercent != null);
-        if (points.length > 0) {
-            let baseline = points[0].declineRatePercent;
-            let latestPoint = points[points.length - 1];
-            let latest = latestPoint.declineRatePercent;
-            let ratio = latest / baseline;
-            let ppIncrease = latest - baseline;
 
-            const RATIO_CRITICAL = 2, PP_CRITICAL = 10;
-            const RATIO_WARNING = 1.5, PP_WARNING = 5;
-
-            if (ratio >= RATIO_WARNING || ppIncrease >= PP_WARNING) {
-                let isCritical = ratio >= RATIO_CRITICAL || ppIncrease >= PP_CRITICAL;
-                result.anomalyFlags.push({
-                    metric: 'Decline Rate',
-                    deviation: ratio.toFixed(1) + 'x baseline',
-                    value: latest + '%',
-                    baseline: baseline + '%',
-                    percentChange: ppIncrease.toFixed(1),
-                    interpretation: `${latestPoint.eventLabel}: ${latestPoint.eventDescription}`
-                });
-                result.hasAnomaly = true;
-                if (result.anomalyType === 'none') result.anomalyType = 'production_decline';
-                result.recommendation = isCritical
-                    ? 'Schedule workover evaluation (e.g. caliper log, mechanical clean-out)'
-                    : 'Continue monitoring; investigate contributing wells or reservoir changes';
-            }
-        }
-    }
 
     return result;
 }
