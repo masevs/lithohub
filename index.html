@@ -726,9 +726,42 @@ function updatePanel() {
         `;
     }
 
+    if (selectedAsset.geochemicalHistory) {
+        let gpoints = selectedAsset.geochemicalHistory.points;
+        let baselineNCG = gpoints[0].ncgWtPercent;
+
+        html += `
+            <div class="content-section">
+                <div class="section-title">Geochemical Response (NCG & HCO3)</div>
+                <div class="chart-wrapper">
+                    <div class="chart-container" id="geochemChartContainer"></div>
+                    <div style="font-size: 10px; color: var(--text-tertiary); margin-top: 6px; font-style: italic;">Values approximate — digitized from original figure</div>
+                </div>
+            </div>
+            <div class="content-section">
+                <div class="section-title">Enthalpy & Flow Rate (Thermal Impact Check)</div>
+                <div class="chart-wrapper">
+                    <div class="chart-container" id="enthalpyFlowChartContainer"></div>
+                    <div style="font-size: 10px; color: var(--text-tertiary); margin-top: 6px; font-style: italic;">Values approximate — digitized from original figure</div>
+                </div>
+            </div>
+            <div class="content-section">
+                <div class="section-title">Event Log</div>
+                ${gpoints.slice().reverse().map(ev => `
+                    <div class="anomaly-flag ${ev.ncgWtPercent < baselineNCG ? 'critical' : 'normal'}">
+                        <div class="flag-metric">${ev.date} — ${ev.eventLabel}</div>
+                        <div class="flag-detail">${ev.eventDescription}</div>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+    }
+
     document.getElementById('panelContent').innerHTML = html;
     renderChart('whp');
     renderDeclineChart();
+    renderGeochemChart();
+    renderEnthalpyFlowChart();
 }
     
 function switchChart(metric, btn) {
@@ -840,6 +873,108 @@ function renderDeclineChart() {
         }
     });
 }
+function renderGeochemChart() {
+    if (!selectedAsset || !selectedAsset.geochemicalHistory) return;
+    let points = selectedAsset.geochemicalHistory.points;
+    let container = document.getElementById('geochemChartContainer');
+    if (!container) return;
+    let canvas = document.createElement('canvas');
+    container.innerHTML = '';
+    container.appendChild(canvas);
+
+    new Chart(canvas, {
+        type: 'line',
+        data: {
+            labels: points.map(p => p.date),
+            datasets: [
+                {
+                    label: 'NCG (wt%)',
+                    data: points.map(p => p.ncgWtPercent),
+                    borderColor: '#f59e0b',
+                    backgroundColor: '#f59e0b18',
+                    borderWidth: 2,
+                    fill: false,
+                    tension: 0.2,
+                    pointRadius: 4,
+                    yAxisID: 'yNCG'
+                },
+                {
+                    label: 'HCO3 (ppm)',
+                    data: points.map(p => p.hco3Ppm),
+                    borderColor: '#2563eb',
+                    backgroundColor: '#2563eb18',
+                    borderWidth: 2,
+                    fill: false,
+                    tension: 0.2,
+                    pointRadius: 4,
+                    yAxisID: 'yHCO3'
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { labels: { color: '#8b949e', font: { size: 10 } } } },
+            scales: {
+                yNCG: { type: 'linear', position: 'left', min: 0, max: 1, title: { display: true, text: 'NCG (wt%)', color: '#8b949e', font: { size: 10 } }, ticks: { color: '#6e7681', font: { size: 10 } }, grid: { color: '#21262d' } },
+                yHCO3: { type: 'linear', position: 'right', min: 0, max: 200, title: { display: true, text: 'HCO3 (ppm)', color: '#8b949e', font: { size: 10 } }, ticks: { color: '#6e7681', font: { size: 10 } }, grid: { drawOnChartArea: false } },
+                x: { ticks: { color: '#6e7681', font: { size: 9 } }, grid: { color: '#21262d' } }
+            }
+        }
+    });
+}
+
+function renderEnthalpyFlowChart() {
+    if (!selectedAsset || !selectedAsset.geochemicalHistory) return;
+    let points = selectedAsset.geochemicalHistory.points;
+    let container = document.getElementById('enthalpyFlowChartContainer');
+    if (!container) return;
+    let canvas = document.createElement('canvas');
+    container.innerHTML = '';
+    container.appendChild(canvas);
+
+    new Chart(canvas, {
+        type: 'line',
+        data: {
+            labels: points.map(p => p.date),
+            datasets: [
+                {
+                    label: 'Enthalpy (kJ/kg)',
+                    data: points.map(p => p.enthalpyKjKg),
+                    borderColor: '#42f5b9',
+                    backgroundColor: '#42f5b918',
+                    borderWidth: 2,
+                    fill: false,
+                    tension: 0.2,
+                    pointRadius: 4,
+                    yAxisID: 'yH'
+                },
+                {
+                    label: 'Flow Rate (T/hr)',
+                    data: points.map(p => p.flowRateTPerHr),
+                    borderColor: '#ef4444',
+                    backgroundColor: '#ef444418',
+                    borderWidth: 2,
+                    fill: false,
+                    tension: 0.2,
+                    pointRadius: 4,
+                    yAxisID: 'yFR'
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { labels: { color: '#8b949e', font: { size: 10 } } } },
+            scales: {
+                yH: { type: 'linear', position: 'left', min: 0, max: 2000, title: { display: true, text: 'Enthalpy (kJ/kg)', color: '#8b949e', font: { size: 10 } }, ticks: { color: '#6e7681', font: { size: 10 } }, grid: { color: '#21262d' } },
+                yFR: { type: 'linear', position: 'right', min: 0, title: { display: true, text: 'Flow Rate (T/hr)', color: '#8b949e', font: { size: 10 } }, ticks: { color: '#6e7681', font: { size: 10 } }, grid: { drawOnChartArea: false } },
+                x: { ticks: { color: '#6e7681', font: { size: 9 } }, grid: { color: '#21262d' } }
+            }
+        }
+    });
+}
+
     function computeAnomalies(asset) {
     let result = {
         hasAnomaly: false,
@@ -877,6 +1012,40 @@ function renderDeclineChart() {
                 result.recommendation = isCritical
                     ? 'Schedule workover evaluation (e.g. caliper log, mechanical clean-out)'
                     : 'Continue monitoring; investigate contributing wells or reservoir changes';
+            }
+        }
+    }
+
+    // Injection breakthrough anomaly (geochemical history data, e.g. Silangkitang)
+    if (asset.geochemicalHistory && asset.geochemicalHistory.points) {
+        let gpoints = asset.geochemicalHistory.points;
+        if (gpoints.length > 0) {
+            let baselineNCG = gpoints[0].ncgWtPercent;
+            let latestPoint = gpoints[gpoints.length - 1];
+            let latestNCG = latestPoint.ncgWtPercent;
+            let pctDrop = ((baselineNCG - latestNCG) / baselineNCG) * 100;
+
+            const NCG_DROP_WARNING = 15;
+            const NCG_DROP_CRITICAL = 25;
+
+            if (pctDrop >= NCG_DROP_WARNING) {
+                let baselineEnthalpy = gpoints[0].enthalpyKjKg;
+                let latestEnthalpy = latestPoint.enthalpyKjKg;
+                let thermalStable = latestEnthalpy >= baselineEnthalpy * 0.95;
+
+                result.anomalyFlags.push({
+                    metric: 'NCG (Chemical Breakthrough)',
+                    deviation: pctDrop.toFixed(1) + '% decline',
+                    value: latestNCG + ' wt%',
+                    baseline: baselineNCG + ' wt%',
+                    percentChange: (-pctDrop).toFixed(1),
+                    interpretation: `${latestPoint.eventLabel}: ${latestPoint.eventDescription}`
+                });
+                result.hasAnomaly = true;
+                if (result.anomalyType === 'none') result.anomalyType = 'injection_breakthrough';
+                result.recommendation = thermalStable
+                    ? 'Chemical breakthrough confirmed, no thermal impact yet — continue routine geochemical monitoring (NCG, HCO3)'
+                    : 'Chemical AND thermal impact signs detected — evaluate injection rate/location urgently';
             }
         }
     }
