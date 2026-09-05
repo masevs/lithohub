@@ -656,15 +656,15 @@ function updatePanel() {
             <div class="sensor-grid">
                 <div class="sensor-item">
                     <div class="sensor-label">Temperature</div>
-                    <div class="sensor-value">${selectedAsset.currentTemp != null ? selectedAsset.currentTemp + '°C' : '— n/a'}</div>
+                    <div class="sensor-value">${selectedAsset.currentTemp != null ? selectedAsset.currentTemp + '°C' : 'No data'}</div>
                 </div>
                 <div class="sensor-item">
                     <div class="sensor-label">Wellhead Pressure</div>
-                    <div class="sensor-value">${selectedAsset.currentWHP != null ? selectedAsset.currentWHP + ' PSI' : '— n/a'}</div>
+                    <div class="sensor-value">${selectedAsset.currentWHP != null ? selectedAsset.currentWHP + ' PSI' : 'No data'}</div>
                 </div>
                 <div class="sensor-item">
                     <div class="sensor-label">Pressure</div>
-                    <div class="sensor-value">${selectedAsset.currentPressure != null ? selectedAsset.currentPressure + ' PSI' : '— n/a'}</div>
+                    <div class="sensor-value">${selectedAsset.currentPressure != null ? selectedAsset.currentPressure + ' PSI' : 'No data'}</div>
                 </div>
             </div>
         </div>
