@@ -202,13 +202,27 @@
         "eventDescription": "Steam rate dropped from 190 to 90 kph with no change in neighboring wells' extraction rate. Sinker bar survey (2.25\" tool) found a blockage at 3730 ft-md; recovered scale sample was 80% amorphous silica by petrographic analysis."
       },
       {
-        "date": "2007-06",
-        "steamRateKph": 190,
+       "date": "2007-06",
+        "steamRateKph": null,
         "declineRatePercent": null,
         "eventLabel": "Workover recovery",
         "eventDescription": "Mechanical clean-out of scale performed. Production recovered to a level consistent with the well's hydraulic model, confirming the decline was caused exclusively by wellbore scale, not formation-level damage."
       }
-    ]
+    ],
+    "digitizedSteamRate": {
+      "note": "Approximate values visually digitized from Figure 4 (Libert & Pasikki, 2010). These are estimates, not exact text-quoted figures like the points above.",
+      "points": [
+        { "yearApprox": 2003.0, "steamRateKph": 355 },
+        { "yearApprox": 2003.3, "steamRateKph": 345 },
+        { "yearApprox": 2003.6, "steamRateKph": 310 },
+        { "yearApprox": 2004.0, "steamRateKph": 290 },
+        { "yearApprox": 2004.5, "steamRateKph": 285 },
+        { "yearApprox": 2005.15, "steamRateKph": 247 },
+        { "yearApprox": 2005.9, "steamRateKph": 200 },
+        { "yearApprox": 2006.85, "steamRateKph": 90 },
+        { "yearApprox": 2008.05, "steamRateKph": 150, "note": "Workover recovery period (circled in original figure)" }
+      ]
+    }
   },
   "source": "Libert, F. and Pasikki, R. (2010). Identifying Important Reservoir Characteristics Using Calibrated Wellbore Hydraulic Models in the Salak Geothermal Field, Indonesia. Proceedings World Geothermal Congress 2010, Bali."
 }
