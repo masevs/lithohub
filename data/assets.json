@@ -174,35 +174,35 @@
     "unitNote": "Steam rate in kilo-pounds per hour (kph); decline rate in percent per year",
     "points": [
       {
-        "date": "2002-12",
+        "date": "Dec 2002",
         "steamRateKph": 280,
         "declineRatePercent": 8,
         "eventLabel": "Well completed — baseline established",
         "eventDescription": "Well #1 completed at TD 5120 ft-md in the East Awibengkok steam cap reservoir. Initial production 280 kph at a normal decline rate of 8%. This is the well's baseline."
       },
       {
-        "date": "2005-early",
+        "date": "2005",
         "steamRateKph": null,
         "declineRatePercent": 23,
         "eventLabel": "Production interference",
         "eventDescription": "Decline rate rose to 23%. A new production well was drilled into the same reservoir sector and a neighboring well converted from two-phase to dry steam, increasing total field extraction from the East Salak steam cap."
       },
       {
-        "date": "2006-late",
+        "date": "2006",
         "steamRateKph": 190,
         "declineRatePercent": null,
         "eventLabel": "Pre-blockage level",
         "eventDescription": "Steam rate still at 190 kph, the level immediately before the sharp drop described below."
       },
       {
-        "date": "2006-late",
+        "date": "2006",
         "steamRateKph": 90,
         "declineRatePercent": 237,
         "eventLabel": "Silica scale blockage confirmed",
         "eventDescription": "Steam rate dropped from 190 to 90 kph with no change in neighboring wells' extraction rate. Sinker bar survey (2.25\" tool) found a blockage at 3730 ft-md; recovered scale sample was 80% amorphous silica by petrographic analysis."
       },
       {
-       "date": "2007-06",
+       "date": "June 2007",
         "steamRateKph": null,
         "declineRatePercent": null,
         "eventLabel": "Workover recovery",
