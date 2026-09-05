@@ -689,6 +689,18 @@ function updatePanel() {
    if (selectedAsset.productionHistory) {
         let events = selectedAsset.productionHistory.points;
         let baselineDR = events.find(p => p.declineRatePercent != null).declineRatePercent;
+
+        let grouped = [];
+        events.forEach(ev => {
+            let last = grouped[grouped.length - 1];
+            if (last && last.date === ev.date) {
+                last.items.push(ev);
+            } else {
+                grouped.push({ date: ev.date, items: [ev] });
+            }
+        });
+        let displayOrder = grouped.slice().reverse();
+
         html += `
             <div class="content-section">
                 <div class="section-title">Production History (Steam Rate)</div>
@@ -699,10 +711,15 @@ function updatePanel() {
             </div>
             <div class="content-section">
                 <div class="section-title">Event Log</div>
-                ${events.map(ev => `
-                    <div class="anomaly-flag ${(ev.declineRatePercent && ev.declineRatePercent > baselineDR) ? 'critical' : 'normal'}">
-                        <div class="flag-metric">${ev.date} — ${ev.eventLabel}</div>
-                        <div class="flag-detail">${ev.eventDescription}</div>
+                ${displayOrder.map(group => `
+                    <div class="anomaly-flag ${group.items.some(ev => ev.declineRatePercent && ev.declineRatePercent > baselineDR) ? 'critical' : 'normal'}">
+                        <div class="flag-metric">${group.date}</div>
+                        ${group.items.map(ev => `
+                            <div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.08);">
+                                <div style="font-weight: 600; color: var(--text-primary); font-size: 11px; margin-bottom: 3px;">${ev.eventLabel}</div>
+                                <div class="flag-detail">${ev.eventDescription}</div>
+                            </div>
+                        `).join('')}
                     </div>
                 `).join('')}
             </div>
@@ -713,7 +730,7 @@ function updatePanel() {
     renderChart('whp');
     renderDeclineChart();
 }
-
+    
 function switchChart(metric, btn) {
     activeMetric = metric;
     document.querySelectorAll('.chart-tab').forEach(b => b.classList.remove('active'));
