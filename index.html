@@ -691,9 +691,10 @@ function updatePanel() {
         let baselineDR = events.find(p => p.declineRatePercent != null).declineRatePercent;
         html += `
             <div class="content-section">
-                <div class="section-title">Decline Rate History</div>
+                <div class="section-title">Production History (Steam Rate)</div>
                 <div class="chart-wrapper">
                     <div class="chart-container" id="declineChartContainer"></div>
+                    <div style="font-size: 10px; color: var(--text-tertiary); margin-top: 6px; font-style: italic;">Values approximate — digitized from original figure</div>
                 </div>
             </div>
             <div class="content-section">
@@ -787,10 +788,9 @@ function renderChart(metric) {
 }
 
 function renderDeclineChart() {
-    if (!selectedAsset || !selectedAsset.productionHistory) return;
-    let points = selectedAsset.productionHistory.points.filter(p => p.declineRatePercent != null);
-    if (points.length === 0) return;
-    let baseline = points[0].declineRatePercent;
+    if (!selectedAsset || !selectedAsset.productionHistory || !selectedAsset.productionHistory.digitizedSteamRate) return;
+    let points = selectedAsset.productionHistory.digitizedSteamRate.points;
+    if (!points || points.length === 0) return;
     let container = document.getElementById('declineChartContainer');
     if (!container) return;
     let canvas = document.createElement('canvas');
@@ -798,39 +798,27 @@ function renderDeclineChart() {
     container.appendChild(canvas);
 
     new Chart(canvas, {
-        type: 'line',
+        type: 'scatter',
         data: {
-            labels: points.map(p => p.date),
-            datasets: [
-                {
-                    label: 'Decline Rate (%)',
-                    data: points.map(p => p.declineRatePercent),
-                    borderColor: '#ef4444',
-                    backgroundColor: '#ef444418',
-                    borderWidth: 2,
-                    fill: true,
-                    tension: 0.2,
-                    pointRadius: 4,
-                    pointBackgroundColor: '#ef4444'
-                },
-                {
-                    label: 'Baseline',
-                    data: Array(points.length).fill(baseline),
-                    borderColor: '#1f8b97',
-                    borderWidth: 1.5,
-                    borderDash: [5,5],
-                    fill: false,
-                    pointRadius: 0
-                }
-            ]
+            datasets: [{
+                label: 'Steam Rate (kph) — approx.',
+                data: points.map(p => ({ x: p.yearApprox, y: p.steamRateKph })),
+                showLine: true,
+                borderColor: 'rgba(239,68,68,0.35)',
+                backgroundColor: '#ef4444',
+                pointRadius: 5,
+                pointHoverRadius: 7,
+                borderWidth: 1.5,
+                tension: 0.15
+            }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
             plugins: { legend: { labels: { color: '#8b949e', font: { size: 10 } } } },
             scales: {
-                y: { ticks: { color: '#6e7681', font: { size: 10 }, callback: v => v + '%' }, grid: { color: '#21262d' } },
-                x: { ticks: { color: '#6e7681', font: { size: 9 } }, grid: { color: '#21262d' } }
+                y: { title: { display: true, text: 'Steam Rate (kph)', color: '#8b949e', font: { size: 10 } }, ticks: { color: '#6e7681', font: { size: 10 } }, grid: { color: '#21262d' } },
+                x: { title: { display: true, text: 'Year', color: '#8b949e', font: { size: 10 } }, ticks: { color: '#6e7681', font: { size: 9 } }, grid: { color: '#21262d' } }
             }
         }
     });
