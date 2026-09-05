@@ -225,5 +225,76 @@
     }
   },
   "source": "Libert, F. and Pasikki, R. (2010). Identifying Important Reservoir Characteristics Using Calibrated Wellbore Hydraulic Models in the Salak Geothermal Field, Indonesia. Proceedings World Geothermal Congress 2010, Bali."
+},
+{
+  "id": "well-005",
+  "name": "Silangkitang Northernmost Production Well",
+  "type": "Geothermal Well",
+  "latitude": 1.79,
+  "longitude": 99.19,
+  "coordinateNote": "Approximate — derived from field's reported distance (~35 km SE of Tarutung); exact well coordinates not published",
+  "depth": null,
+  "status": "active",
+  "location": "Silangkitang (SIL) Field, Tapanuli Utara, North Sumatra",
+  "operatingSince": "2017-Q1",
+  "rockType": "Metasediments (marble, phyllite, argillite, meta-quartzite) basement, overlain by Tertiary conglomerate/greywacke/mudstone",
+  "rockTypeNote": "Field-level characterization; not well-specific core/log data",
+  "rockTypeSource": "Simatupang, Matsuda & Astra (2020), Section 1 - Introduction",
+  "subsidenceRisk": null,
+  "currentTemp": null,
+  "currentPressure": null,
+  "currentWHP": null,
+  "vibration": null,
+  "anomalyType": "injection_breakthrough",
+  "anomalyDescription": "Chemical breakthrough detected: NCG and HCO3 declining since injection began (2017), consistent with injectate liquid (low-NCG, low-HCO3) reaching this well from SIL 2 injection pad. Confirmed by tracer test showing 1.59% cumulative mass return from SIL 2 injectors within 4 months. However, no thermal breakthrough detected — enthalpy remains stable and flow rate has increased, attributed to reservoir boiling and sufficient residence time for injectate to reheat before reaching the well.",
+  "anomalyDepth": null,
+  "baselineWHP": null,
+  "baselineTemp": null,
+  "baselinePressure": null,
+  "historicalData": null,
+  "geochemicalHistory": {
+    "metric": "ncg_hco3_enthalpy_flowrate",
+    "unitNote": "NCG in weight %, HCO3 in ppm, enthalpy in kJ/kg, flow rate in tonnes/hour",
+    "dataQuality": "Digitized approximate values from Figure 11(b), Simatupang et al. (2020) — not exact text-quoted figures",
+    "points": [
+      {
+        "date": "Jan 2016",
+        "ncgWtPercent": 0.78,
+        "hco3Ppm": 155,
+        "enthalpyKjKg": 1300,
+        "flowRateTPerHr": 400,
+        "eventLabel": "Pre-breakthrough baseline",
+        "eventDescription": "Early monitoring point shortly after commercial production began (Mar 2017 for full field; this well among initial producers). NCG and HCO3 at reservoir-characteristic levels."
+      },
+      {
+        "date": "Sep 2017",
+        "ncgWtPercent": 0.68,
+        "hco3Ppm": 135,
+        "enthalpyKjKg": 1320,
+        "flowRateTPerHr": 620,
+        "eventLabel": "Early chemical decline",
+        "eventDescription": "NCG and HCO3 trending downward, consistent with early injectate liquid arrival from SIL 2 injection wells to the north."
+      },
+      {
+        "date": "Apr 2018",
+        "ncgWtPercent": 0.58,
+        "hco3Ppm": 118,
+        "enthalpyKjKg": 1350,
+        "flowRateTPerHr": 580,
+        "eventLabel": "Continued chemical breakthrough",
+        "eventDescription": "NCG and HCO3 continuing to decline. Enthalpy remains stable, indicating no thermal impact despite chemical dilution."
+      },
+      {
+        "date": "Oct 2018",
+        "ncgWtPercent": 0.55,
+        "hco3Ppm": 112,
+        "enthalpyKjKg": 1320,
+        "flowRateTPerHr": 630,
+        "eventLabel": "Confirmed chemical breakthrough, no thermal impact",
+        "eventDescription": "NCG and HCO3 at lowest observed levels (~30% decline from baseline). Enthalpy and flow rate both stable-to-increasing, confirming injectate liquid has been sufficiently reheated by reservoir rock (>280°C) before reaching this well."
+      }
+    ]
+  },
+  "source": "Simatupang, C., Matsuda, K. and Astra, D. (2020). The Initial State Geochemical Model and Reservoir Response of 2 Years Production at Silangkitang, a Fault-Controlled Geothermal System along the Great Sumatera Fault. Proceedings World Geothermal Congress 2020, Reykjavik."
 }
 ]
