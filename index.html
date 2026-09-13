@@ -1068,32 +1068,36 @@ function diagnoseSalak(asset) {
     }
 
     // --- NEW — Tier B: Divergence from the calibrated WELLHIST hydraulic model ---
-    // "Sustained" = the last 2 points are both below the model. This operationalizes the
-    // blueprint's qualitative definition without inventing a percentage/kph threshold.
-    let divergence = computeModelDivergence(asset);
-    if (divergence && divergence.length >= 2) {
-        let last = divergence[divergence.length - 1];
-        let prev = divergence[divergence.length - 2];
+// "Sustained" = the last 2 points are both below the model — drives severity.
+// The value/baseline shown is the single worst historical gap, for a stronger visual.
+let divergence = computeModelDivergence(asset);
+if (divergence && divergence.length >= 2) {
+    let last = divergence[divergence.length - 1];
+    let prev = divergence[divergence.length - 2];
 
-        if (last.belowModel) {
-            let sustained = prev.belowModel === true;
-            result.severity = maxSeverity(result.severity, sustained ? 'critical' : 'warning');
-            result.anomalyFlags.push({
-                metric: 'Model Divergence',
-                deviation: sustained ? 'Sustained — 2+ points below model' : 'Early — 1 point below model',
-                value: last.measuredKph + ' kph',
-                baseline: last.modelKph + ' kph (WELLHIST, interpolated)',
-                interpretation: sustained
-                    ? 'Actual steam rate has stayed below the calibrated hydraulic model across consecutive points — not explained by natural reservoir decline, since the model already accounts for that.'
-                    : 'Actual steam rate just dropped below the calibrated hydraulic model. Early signal — confirm at the next data point.'
-            });
-            result.hasAnomaly = true;
-            if (result.anomalyType === 'none') result.anomalyType = 'production_decline';
-            if (sustained) {
-                result.recommendation = 'Schedule workover evaluation (e.g. caliper log, mechanical clean-out)';
-            }
+    if (last.belowModel) {
+        let sustained = prev.belowModel === true;
+        result.severity = maxSeverity(result.severity, sustained ? 'critical' : 'warning');
+
+        let valid = divergence.filter(p => p.modelKph !== null);
+        let worst = valid.reduce((min, p) =>
+            (min === null || (p.measuredKph - p.modelKph) < (min.measuredKph - min.modelKph)) ? p : min, null);
+
+        result.anomalyFlags.push({
+            metric: 'Model Divergence',
+            deviation: sustained ? 'Sustained — 2+ points below model' : 'Early — 1 point below model',
+            value: worst.measuredKph + ' kph',
+            baseline: worst.modelKph + ' kph',
+            interpretation: 'Actual steam rate has stayed below the calibrated hydraulic model across consecutive points'
+        });
+
+        result.hasAnomaly = true;
+        if (result.anomalyType === 'none') result.anomalyType = 'production_decline';
+        if (sustained) {
+            result.recommendation = 'Schedule workover evaluation (e.g. caliper log, mechanical clean-out)';
         }
     }
+}
 
     return result;
 }
