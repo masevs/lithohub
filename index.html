@@ -992,6 +992,40 @@ function renderEnthalpyFlowChart() {
     return order[b] > order[a] ? b : a;
 }
 
+// Interpolates the calibrated WELLHIST model curve at an arbitrary year, from whole-year anchors.
+// No extrapolation — returns null if the year falls outside the digitized range.
+function interpolateModelRate(modelPoints, year) {
+    let sorted = modelPoints.slice().sort((a, b) => a.year - b.year);
+    if (year < sorted[0].year || year > sorted[sorted.length - 1].year) return null;
+    for (let i = 0; i < sorted.length - 1; i++) {
+        let p0 = sorted[i], p1 = sorted[i + 1];
+        if (year >= p0.year && year <= p1.year) {
+            let frac = (year - p0.year) / (p1.year - p0.year);
+            return p0.modelRateKph + frac * (p1.modelRateKph - p0.modelRateKph);
+        }
+    }
+    return null;
+}
+
+// Pairs each Measured point (digitizedSteamRate) with the interpolated Model (WELLHIST) value.
+// Returned as an array (not just the latest point) so it can also be reused later for a
+// Measured-vs-Model chart.
+function computeModelDivergence(asset) {
+    let measured = asset.productionHistory?.digitizedSteamRate?.points;
+    let model = asset.productionHistory?.digitizedModelRate?.points;
+    if (!measured || !model) return null;
+
+    return measured.map(p => {
+        let modelVal = interpolateModelRate(model, p.yearApprox);
+        return {
+            yearApprox: p.yearApprox,
+            measuredKph: p.steamRateKph,
+            modelKph: modelVal !== null ? Math.round(modelVal * 10) / 10 : null,
+            belowModel: modelVal !== null ? p.steamRateKph < modelVal : null
+        };
+    });
+}
+
 function diagnoseSalak(asset) {
     let result = {
         hasAnomaly: false,
@@ -1032,6 +1066,35 @@ function diagnoseSalak(asset) {
                 : 'Continue monitoring; investigate contributing wells or reservoir changes';
         }
     }
+
+    // --- NEW — Tier B: Divergence from the calibrated WELLHIST hydraulic model ---
+    // "Sustained" = the last 2 points are both below the model. This operationalizes the
+    // blueprint's qualitative definition without inventing a percentage/kph threshold.
+    let divergence = computeModelDivergence(asset);
+    if (divergence && divergence.length >= 2) {
+        let last = divergence[divergence.length - 1];
+        let prev = divergence[divergence.length - 2];
+
+        if (last.belowModel) {
+            let sustained = prev.belowModel === true;
+            result.severity = maxSeverity(result.severity, sustained ? 'critical' : 'warning');
+            result.anomalyFlags.push({
+                metric: 'Model Divergence',
+                deviation: sustained ? 'Sustained — 2+ points below model' : 'Early — 1 point below model',
+                value: last.measuredKph + ' kph',
+                baseline: last.modelKph + ' kph (WELLHIST, interpolated)',
+                interpretation: sustained
+                    ? 'Actual steam rate has stayed below the calibrated hydraulic model across consecutive points — not explained by natural reservoir decline, since the model already accounts for that.'
+                    : 'Actual steam rate just dropped below the calibrated hydraulic model. Early signal — confirm at the next data point.'
+            });
+            result.hasAnomaly = true;
+            if (result.anomalyType === 'none') result.anomalyType = 'production_decline';
+            if (sustained) {
+                result.recommendation = 'Schedule workover evaluation (e.g. caliper log, mechanical clean-out)';
+            }
+        }
+    }
+
     return result;
 }
 
