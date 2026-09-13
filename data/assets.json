@@ -222,6 +222,19 @@
         { "yearApprox": 2006.85, "steamRateKph": 90 },
         { "yearApprox": 2008.05, "steamRateKph": 150, "note": "Workover recovery period (circled in original figure)" }
       ]
+    },
+    "digitizedModelRate": {
+      "note": "Approximate values visually digitized from the green 'Well #1 Model' curve in Figure 4 (Libert & Pasikki, 2010), read at whole-year gridlines. Values at digitizedSteamRate.points' yearApprox are linearly interpolated between these anchors at comparison time — see computeModelDivergence() in index.html.",
+      "points": [
+        { "year": 2003, "modelRateKph": 340 },
+        { "year": 2004, "modelRateKph": 320 },
+        { "year": 2005, "modelRateKph": 280 },
+        { "year": 2006, "modelRateKph": 240 },
+        { "year": 2007, "modelRateKph": 220 },
+        { "year": 2008, "modelRateKph": 180 },
+        { "year": 2009, "modelRateKph": 120 },
+        { "year": 2010, "modelRateKph": 80 }
+      ]
     }
   },
   "source": "Libert, F. and Pasikki, R. (2010). Identifying Important Reservoir Characteristics Using Calibrated Wellbore Hydraulic Models in the Salak Geothermal Field, Indonesia. Proceedings World Geothermal Congress 2010, Bali."
