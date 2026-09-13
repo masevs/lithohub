@@ -1023,7 +1023,7 @@ function diagnoseSalak(asset) {
                 value: latest + '%',
                 baseline: baseline + '%',
                 percentChange: ppIncrease.toFixed(1),
-                interpretation: `${latestPoint.eventLabel}: ${latestPoint.eventDescription}`
+                interpretation: latestPoint.eventLabel
             });
             result.hasAnomaly = true;
             result.anomalyType = 'production_decline';
@@ -1062,18 +1062,18 @@ function diagnoseSilangkitang(asset) {
             result.severity = maxSeverity(result.severity, thermalStable ? 'warning' : 'critical');
 
             result.anomalyFlags.push({
-                metric: 'NCG (Chemical Breakthrough)',
+                metric: 'NCG Concentration',
                 deviation: pctDrop.toFixed(1) + '% decline',
                 value: latestNCG + ' wt%',
                 baseline: baselineNCG + ' wt%',
                 percentChange: (-pctDrop).toFixed(1),
-                interpretation: `${latestPoint.eventLabel}: ${latestPoint.eventDescription}`
+                interpretation: latestPoint.eventLabel
             });
             result.hasAnomaly = true;
             result.anomalyType = 'injection_breakthrough';
             result.recommendation = thermalStable
-                ? 'Chemical breakthrough confirmed, no thermal impact yet — continue routine geochemical monitoring (NCG, HCO3)'
-                : 'Chemical AND thermal impact signs detected — evaluate injection rate/location urgently';
+                ? 'Continue routine geochemical monitoring (NCG, HCO3)'
+                : 'Evaluate injection rate/location urgently';
         }
     }
     return result;
