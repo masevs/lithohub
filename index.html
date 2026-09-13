@@ -987,7 +987,104 @@ function renderEnthalpyFlowChart() {
     });
 }
 
-    function computeAnomalies(asset) {
+        function maxSeverity(a, b) {
+    const order = { normal: 0, warning: 1, critical: 2 };
+    return order[b] > order[a] ? b : a;
+}
+
+function diagnoseSalak(asset) {
+    let result = {
+        hasAnomaly: false,
+        anomalyFlags: [],
+        anomalyType: 'none',
+        severity: 'normal',
+        summary: 'No anomalies detected',
+        recommendation: 'Continue routine monitoring'
+    };
+    if (!asset.productionHistory || !asset.productionHistory.points) return result;
+
+    let points = asset.productionHistory.points.filter(p => p.declineRatePercent != null);
+    if (points.length > 0) {
+        let baseline = points[0].declineRatePercent;
+        let latestPoint = points[points.length - 1];
+        let latest = latestPoint.declineRatePercent;
+        let ratio = latest / baseline;
+        let ppIncrease = latest - baseline;
+
+        const RATIO_CRITICAL = 2, PP_CRITICAL = 10;
+        const RATIO_WARNING = 1.5, PP_WARNING = 5;
+
+        if (ratio >= RATIO_WARNING || ppIncrease >= PP_WARNING) {
+            let isCritical = ratio >= RATIO_CRITICAL || ppIncrease >= PP_CRITICAL;
+            result.severity = maxSeverity(result.severity, isCritical ? 'critical' : 'warning');
+            result.anomalyFlags.push({
+                metric: 'Decline Rate',
+                deviation: ratio.toFixed(1) + 'x baseline',
+                value: latest + '%',
+                baseline: baseline + '%',
+                percentChange: ppIncrease.toFixed(1),
+                interpretation: `${latestPoint.eventLabel}: ${latestPoint.eventDescription}`
+            });
+            result.hasAnomaly = true;
+            result.anomalyType = 'production_decline';
+            result.recommendation = isCritical
+                ? 'Schedule workover evaluation (e.g. caliper log, mechanical clean-out)'
+                : 'Continue monitoring; investigate contributing wells or reservoir changes';
+        }
+    }
+    return result;
+}
+
+function diagnoseSilangkitang(asset) {
+    let result = {
+        hasAnomaly: false,
+        anomalyFlags: [],
+        anomalyType: 'none',
+        severity: 'normal',
+        summary: 'No anomalies detected',
+        recommendation: 'Continue routine monitoring'
+    };
+    if (!asset.geochemicalHistory || !asset.geochemicalHistory.points) return result;
+
+    let gpoints = asset.geochemicalHistory.points;
+    if (gpoints.length > 0) {
+        let baselineNCG = gpoints[0].ncgWtPercent;
+        let latestPoint = gpoints[gpoints.length - 1];
+        let latestNCG = latestPoint.ncgWtPercent;
+        let pctDrop = ((baselineNCG - latestNCG) / baselineNCG) * 100;
+
+        const NCG_DROP_WARNING = 15;
+
+        if (pctDrop >= NCG_DROP_WARNING) {
+            let baselineEnthalpy = gpoints[0].enthalpyKjKg;
+            let latestEnthalpy = latestPoint.enthalpyKjKg;
+            let thermalStable = latestEnthalpy >= baselineEnthalpy * 0.95;
+            result.severity = maxSeverity(result.severity, thermalStable ? 'warning' : 'critical');
+
+            result.anomalyFlags.push({
+                metric: 'NCG (Chemical Breakthrough)',
+                deviation: pctDrop.toFixed(1) + '% decline',
+                value: latestNCG + ' wt%',
+                baseline: baselineNCG + ' wt%',
+                percentChange: (-pctDrop).toFixed(1),
+                interpretation: `${latestPoint.eventLabel}: ${latestPoint.eventDescription}`
+            });
+            result.hasAnomaly = true;
+            result.anomalyType = 'injection_breakthrough';
+            result.recommendation = thermalStable
+                ? 'Chemical breakthrough confirmed, no thermal impact yet — continue routine geochemical monitoring (NCG, HCO3)'
+                : 'Chemical AND thermal impact signs detected — evaluate injection rate/location urgently';
+        }
+    }
+    return result;
+}
+
+function computeAnomalies(asset) {
+    // Dispatcher: pick the field-specific diagnostic strategy based on available data
+    if (asset.productionHistory) return diagnoseSalak(asset);
+    if (asset.geochemicalHistory) return diagnoseSilangkitang(asset);
+
+    // Legacy sensor-based diagnostics for the original demo assets (WHP/Temp/Chloride)
     let result = {
         hasAnomaly: false,
         anomalyFlags: [],
@@ -997,74 +1094,7 @@ function renderEnthalpyFlowChart() {
         recommendation: 'Continue routine monitoring'
     };
 
-    // Decline rate anomaly (production history data, e.g. Salak Well #1)
-    if (asset.productionHistory && asset.productionHistory.points) {
-        let points = asset.productionHistory.points.filter(p => p.declineRatePercent != null);
-        if (points.length > 0) {
-            let baseline = points[0].declineRatePercent;
-            let latestPoint = points[points.length - 1];
-            let latest = latestPoint.declineRatePercent;
-            let ratio = latest / baseline;
-            let ppIncrease = latest - baseline;
-
-            const RATIO_CRITICAL = 2, PP_CRITICAL = 10;
-            const RATIO_WARNING = 1.5, PP_WARNING = 5;
-
-            if (ratio >= RATIO_WARNING || ppIncrease >= PP_WARNING) {
-                let isCritical = ratio >= RATIO_CRITICAL || ppIncrease >= PP_CRITICAL;
-                result.severity = maxSeverity(result.severity, isCritical ? 'critical' : 'warning');
-                result.anomalyFlags.push({
-                    metric: 'Decline Rate',
-                    deviation: ratio.toFixed(1) + 'x baseline',
-                    value: latest + '%',
-                    baseline: baseline + '%',
-                    percentChange: ppIncrease.toFixed(1),
-                    interpretation: `${latestPoint.eventLabel}: ${latestPoint.eventDescription}`
-                });
-                result.hasAnomaly = true;
-                if (result.anomalyType === 'none') result.anomalyType = 'production_decline';
-                result.recommendation = isCritical
-                    ? 'Schedule workover evaluation (e.g. caliper log, mechanical clean-out)'
-                    : 'Continue monitoring; investigate contributing wells or reservoir changes';
-            }
-        }
-    }
-
-    // Injection breakthrough anomaly (geochemical history data, e.g. Silangkitang)
-    if (asset.geochemicalHistory && asset.geochemicalHistory.points) {
-        let gpoints = asset.geochemicalHistory.points;
-        if (gpoints.length > 0) {
-            let baselineNCG = gpoints[0].ncgWtPercent;
-            let latestPoint = gpoints[gpoints.length - 1];
-            let latestNCG = latestPoint.ncgWtPercent;
-            let pctDrop = ((baselineNCG - latestNCG) / baselineNCG) * 100;
-
-            const NCG_DROP_WARNING = 15;
-            const NCG_DROP_CRITICAL = 25;
-
-            if (pctDrop >= NCG_DROP_WARNING) {
-                let baselineEnthalpy = gpoints[0].enthalpyKjKg;
-                let latestEnthalpy = latestPoint.enthalpyKjKg;
-                let thermalStable = latestEnthalpy >= baselineEnthalpy * 0.95;
-                result.severity = maxSeverity(result.severity, thermalStable ? 'warning' : 'critical');
-
-                result.anomalyFlags.push({
-                    metric: 'NCG (Chemical Breakthrough)',
-                    deviation: pctDrop.toFixed(1) + '% decline',
-                    value: latestNCG + ' wt%',
-                    baseline: baselineNCG + ' wt%',
-                    percentChange: (-pctDrop).toFixed(1),
-                    interpretation: `${latestPoint.eventLabel}: ${latestPoint.eventDescription}`
-                });
-                result.hasAnomaly = true;
-                if (result.anomalyType === 'none') result.anomalyType = 'injection_breakthrough';
-                result.recommendation = thermalStable
-                    ? 'Chemical breakthrough confirmed, no thermal impact yet — continue routine geochemical monitoring (NCG, HCO3)'
-                    : 'Chemical AND thermal impact signs detected — evaluate injection rate/location urgently';
-            }
-        }
-    }
-        if (!asset.historicalData) return result;
+    if (!asset.historicalData) return result;
     let hist = asset.historicalData;
     let SIGMA = 1.5;
 
@@ -1133,14 +1163,9 @@ function renderEnthalpyFlowChart() {
         }
     }
 
-
     return result;
 }
 
-function maxSeverity(a, b) {
-    const order = { normal: 0, warning: 1, critical: 2 };
-    return order[b] > order[a] ? b : a;
-}
 function mean(arr) { return arr.reduce((a,b) => a+b) / arr.length; }
 function std(arr, m) { return Math.sqrt(arr.reduce((s,v) => s + Math.pow(v-m, 2)) / arr.length); }
 function closePanel() {
