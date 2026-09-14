@@ -778,6 +778,20 @@ function updatePanel() {
         `;
     }
 
+    if (selectedAsset.eventLog) {
+        html += `
+            <div class="content-section">
+                <div class="section-title">Event Log</div>
+                ${selectedAsset.eventLog.points.slice().reverse().map(ev => `
+                    <div class="anomaly-flag normal">
+                        <div class="flag-metric">${ev.date} — ${ev.eventLabel}</div>
+                        <div class="flag-detail">${ev.eventDescription}</div>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+    }
+
     document.getElementById('panelContent').innerHTML = html;
     renderChart('whp');
     renderDeclineChart();
