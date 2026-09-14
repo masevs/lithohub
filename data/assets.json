@@ -347,7 +347,7 @@
   "baselinePressure": null,
   "historicalData": null,
   "ptProfileIllustration": {
-    "note": "Approximate values visually digitized from Figure 6 (Yuniar et al. 2015). Only 2 of 6 original curves shown (Static Temperature and Temp Post Intrusion 2013) — the two most relevant to the casing-leak narrative. Not used in the anomaly detection logic; shown for visual context only.",
+  "note": "Approximate values digitized from Fig. 6 (Yuniar et al. 2015). ",
     "staticTemperature": {
       "points": [
         { "elevationM": 700, "tempC": 20 },
