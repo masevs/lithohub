@@ -1145,11 +1145,28 @@ function diagnoseSilangkitang(asset) {
     }
     return result;
 }
+    function diagnoseUlubelu(asset) {
+    return {
+        hasAnomaly: true,
+        anomalyFlags: [{
+            metric: 'Casing Defect',
+            deviation: 'N/A — historical case, not computed',
+            value: 'Confirmed via downhole PT survey',
+            baseline: 'Static pre-intrusion temperature profile',
+            interpretation: 'Caused by a shallow casing defect allowing cold water intrusion into the wellbore, confirmed via downhole PT survey showing temperature decline versus the static baseline profile.'
+        }],
+        anomalyType: 'casing_leak_cold_influx',
+        severity: 'critical',
+        summary: 'Casing defect / cold water influx',
+        recommendation: 'Plan for well repair.'
+    };
+}
 
 function computeAnomalies(asset) {
     // Dispatcher: pick the field-specific diagnostic strategy based on available data
     if (asset.productionHistory) return diagnoseSalak(asset);
     if (asset.geochemicalHistory) return diagnoseSilangkitang(asset);
+    if (asset.anomalyType === 'casing_leak_cold_influx') return diagnoseUlubelu(asset);
 
     // Legacy sensor-based diagnostics for the original demo assets (WHP/Temp/Chloride)
     let result = {
