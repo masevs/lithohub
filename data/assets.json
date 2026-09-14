@@ -346,6 +346,32 @@
   "baselineTemp": null,
   "baselinePressure": null,
   "historicalData": null,
+  "ptProfileIllustration": {
+    "note": "Approximate values visually digitized from Figure 6 (Yuniar et al. 2015). Only 2 of 6 original curves shown (Static Temperature and Temp Post Intrusion 2013) — the two most relevant to the casing-leak narrative. Not used in the anomaly detection logic; shown for visual context only.",
+    "staticTemperature": {
+      "points": [
+        { "elevationM": 700, "tempC": 20 },
+        { "elevationM": 400, "tempC": 20 },
+        { "elevationM": 100, "tempC": 60 },
+        { "elevationM": 0, "tempC": 150 },
+        { "elevationM": -200, "tempC": 200 },
+        { "elevationM": -500, "tempC": 225 },
+        { "elevationM": -800, "tempC": 275 },
+        { "elevationM": -1100, "tempC": 290 }
+      ]
+    },
+    "postIntrusion2013": {
+      "points": [
+        { "elevationM": 700, "tempC": 20 },
+        { "elevationM": 400, "tempC": 30 },
+        { "elevationM": 100, "tempC": 50 },
+        { "elevationM": -200, "tempC": 55 },
+        { "elevationM": -500, "tempC": 60 },
+        { "elevationM": -800, "tempC": 70 },
+        { "elevationM": -1100, "tempC": 120 }
+      ]
+    }
+  },
   "source": "Yuniar, D.M., Hastuti, P. and Silaban, M. (2015). Ulubelu, First Year Reservoir Monitoring. WGC 2015, Melbourne. / Mulyanto et al. (2015). The Initial-State Geochemistry as a Baseline for Geochemical Monitoring at Ulubelu Geothermal Field, Indonesia. WGC 2015, Melbourne. / Nusantara, V.D.M. et al. (2021). Reservoir Rock of Ulubelu Geothermal System, Indonesia. WGC 2020+1, Reykjavik."
 }
 ]
