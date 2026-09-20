@@ -430,9 +430,16 @@
       { "date": "2018", "clPpm": 449.08, "so4Ppm": 102.87 }
     ]
   },
+  "drynessMeasured": {
+    "note": "Visually digitized from Fig. 7A (dryness %) and Fig. 7B (steam/brine flow rate, ton/hr), cross-validated against each other.",
+    "points": [
+      { "year": "2013", "drynessPercent": 80 },
+      { "year": "2015", "drynessPercent": 85, "steamFlowRateTonHr": 32, "brineFlowRateTonHr": 5, "drynessCalculated": 86.5 }
+    ]
+  },
   "vibration": null,
   "anomalyType": "boiling_dryness_increase",
-  "anomalyDescription": "LHD-8 shows an increasing dryness trend (steam fraction) — one of three southern-reservoir wells (with LHD-15, LHD-18) classified by the authors as 'increasing dryness' (Fig. 7A), reaching approximately 82% by 2015. Attributed to boiling from pressure drawdown, consistent with LHD-8 having the shallowest feed zone of all wells studied, though the authors note feed-zone depth alone does not fully explain the pattern (other deep-feed-zone wells also show high dryness).",
+  "anomalyDescription": "LHD-8 shows an increasing dryness trend (steam fraction)",
   "anomalyDepth": null,
   "baselineWHP": null,
   "baselineTemp": null,
