@@ -406,7 +406,7 @@
   "latitude": 1.2712,
   "longitude": 124.8354,
   "coordinateNote": "Approximate — field-level location (Lahendong geothermal power plant, Tomohon/Tompaso, North Sulawesi);",
-  "depth": null,
+  "depth": 1400,
   "status": "active",
   "location": "Lahendong Geothermal Field, Tomohon, North Sulawesi",
   "rockType": "Andesite-Ignimbritic (Volcanic)",
