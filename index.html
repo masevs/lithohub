@@ -1272,7 +1272,7 @@ function diagnoseLahendong(asset) {
 
         if (clIncreasing || so4Decreasing) {
             result.anomalyFlags.push({
-                metric: 'Chloride/Sulfate Trend',
+                metric: 'Reservoir Boiling (Chemical Signature)',
                 deviation: chemAligned ? 'Cl up + SO4 down (aligned boiling signature)' : (clIncreasing ? 'Cl up only' : 'SO4 down only'),
                 value: clLatest.clPpm + ' mg/l Cl, ' + clLatest.so4Ppm + ' mg/l SO4',
                 baseline: clBaseline.clPpm + ' mg/l Cl, ' + clBaseline.so4Ppm + ' mg/l SO4',
@@ -1285,7 +1285,7 @@ function diagnoseLahendong(asset) {
         if (drynessPoints && drynessPoints.length >= 2) {
             let dBaseline = drynessPoints[0], dLatest = drynessPoints[drynessPoints.length - 1];
             result.anomalyFlags.push({
-                metric: 'Dryness Trend',
+                metric: 'Increasing Dryness',
                 deviation: drynessIncreasing ? `+${(dLatest.drynessPercent - dBaseline.drynessPercent).toFixed(0)}pp` : 'Stable/decreasing',
                 value: dLatest.drynessPercent + '%',
                 baseline: dBaseline.drynessPercent + '%',
