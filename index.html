@@ -1242,12 +1242,75 @@ function diagnoseSilangkitang(asset) {
         recommendation: 'Plan for well repair.'
     };
 }
+function diagnoseLahendong(asset) {
+    let result = {
+        hasAnomaly: false,
+        anomalyFlags: [],
+        anomalyType: 'none',
+        severity: 'normal',
+        summary: 'No anomalies detected',
+        recommendation: 'Continue routine monitoring'
+    };
+    if (!asset.geochemicalTrend || !asset.geochemicalTrend.points) return result;
 
+    let gPoints = asset.geochemicalTrend.points;
+    let clBaseline = gPoints[0], clLatest = gPoints[gPoints.length - 1];
+    let clIncreasing = clLatest.clPpm > clBaseline.clPpm;
+    let so4Decreasing = clLatest.so4Ppm < clBaseline.so4Ppm;
+    let chemAligned = clIncreasing && so4Decreasing;
+
+    let drynessIncreasing = false;
+    let drynessPoints = asset.drynessMeasured && asset.drynessMeasured.points;
+    if (drynessPoints && drynessPoints.length >= 2) {
+        let dBaseline = drynessPoints[0], dLatest = drynessPoints[drynessPoints.length - 1];
+        drynessIncreasing = dLatest.drynessPercent > dBaseline.drynessPercent;
+    }
+
+    if (clIncreasing || so4Decreasing || drynessIncreasing) {
+        let allAligned = chemAligned && drynessIncreasing;
+        result.severity = maxSeverity(result.severity, allAligned ? 'critical' : 'warning');
+
+        if (clIncreasing || so4Decreasing) {
+            result.anomalyFlags.push({
+                metric: 'Chloride/Sulfate Trend',
+                deviation: chemAligned ? 'Cl up + SO4 down (aligned boiling signature)' : (clIncreasing ? 'Cl up only' : 'SO4 down only'),
+                value: clLatest.clPpm + ' mg/l Cl, ' + clLatest.so4Ppm + ' mg/l SO4',
+                baseline: clBaseline.clPpm + ' mg/l Cl, ' + clBaseline.so4Ppm + ' mg/l SO4',
+                interpretation: chemAligned
+                    ? 'Consistent with fluid concentration from reservoir boiling'
+                    : 'Partial signal — only one indicator shows the boiling-consistent direction'
+            });
+        }
+
+        if (drynessPoints && drynessPoints.length >= 2) {
+            let dBaseline = drynessPoints[0], dLatest = drynessPoints[drynessPoints.length - 1];
+            result.anomalyFlags.push({
+                metric: 'Dryness Trend',
+                deviation: drynessIncreasing ? `+${(dLatest.drynessPercent - dBaseline.drynessPercent).toFixed(0)}pp` : 'Stable/decreasing',
+                value: dLatest.drynessPercent + '%',
+                baseline: dBaseline.drynessPercent + '%',
+                interpretation: drynessIncreasing
+                    ? `Steam fraction rose from ${dBaseline.year} to ${dLatest.year}, consistent with boiling from pressure drawdown`
+                    : 'No increasing trend observed in the digitized dryness data'
+            });
+        }
+
+        result.hasAnomaly = true;
+        result.anomalyType = 'boiling_dryness_increase';
+        result.recommendation = allAligned
+            ? 'Monitor for continued boiling/dryness progression; evaluate need for make-up wells if productivity declines further'
+            : 'Continue geochemical monitoring; confirm trend with additional sampling';
+    }
+
+    return result;
+}
+    
 function computeAnomalies(asset) {
     // Dispatcher: pick the field-specific diagnostic strategy based on available data
     if (asset.productionHistory) return diagnoseSalak(asset);
     if (asset.geochemicalHistory) return diagnoseSilangkitang(asset);
     if (asset.anomalyType === 'casing_leak_cold_influx') return diagnoseUlubelu(asset);
+    if (asset.geochemicalTrend) return diagnoseLahendong(asset);
 
     // Legacy sensor-based diagnostics for the original demo assets (WHP/Temp/Chloride)
     let result = {
