@@ -423,6 +423,13 @@
   "currentFlowRateUnit": "ton/hr",
   "currentFlowRateNote": "Total mass flow rate, visually read from Fig. 16C (2018 dataset, paired with matching pH/EC values from Table 3)",
   "currentFlowRateSource": "Suherlina et al. (2022), Fig. 16C",
+  "geochemicalTrend": {
+    "note": "Chloride and sulfate concentrations, 2012 vs 2018 (Table 4).",
+    "points": [
+      { "date": "2012", "clPpm": 347, "so4Ppm": 125 },
+      { "date": "2018", "clPpm": 449.08, "so4Ppm": 102.87 }
+    ]
+  },
   "vibration": null,
   "anomalyType": "boiling_dryness_increase",
   "anomalyDescription": "LHD-8 shows an increasing dryness trend (steam fraction) — one of three southern-reservoir wells (with LHD-15, LHD-18) classified by the authors as 'increasing dryness' (Fig. 7A), reaching approximately 82% by 2015. Attributed to boiling from pressure drawdown, consistent with LHD-8 having the shallowest feed zone of all wells studied, though the authors note feed-zone depth alone does not fully explain the pattern (other deep-feed-zone wells also show high dryness).",
