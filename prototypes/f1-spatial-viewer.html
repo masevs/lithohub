@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Spatial Feed-Zone & Well Location Viewer</title>
+<style>
+  :root{
+    --bg:#11151a;
+    --panel:#1a1f26;
+    --panel-2:#20262e;
+    --border:#2a323c;
+    --text:#e7eaee;
+    --text-dim:#8b94a0;
+    --text-faint:#5c6570;
+    --accent-teal:#4fb8a8;
+    --accent-flag:#d4574a;
+    --mono: ui-monospace, "SF Mono", "Cascadia Code", Consolas, monospace;
+    --sans: -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:var(--sans);}
+  #root{display:flex;min-height:100vh;}
+
+  /* Sidebar */
+  #sidebar{width:240px;flex-shrink:0;background:var(--panel);border-right:1px solid var(--border);padding:20px 14px;}
+  #sidebar h1{font-size:15px;font-weight:600;margin:0 0 2px;letter-spacing:-0.01em;}
+  #sidebar .sub{font-size:11.5px;color:var(--text-dim);line-height:1.5;margin-bottom:18px;}
+  .badge{display:inline-block;font-size:10.5px;color:var(--accent-teal);border:1px solid rgba(79,184,168,0.35);background:rgba(79,184,168,0.08);padding:3px 8px;border-radius:4px;margin-bottom:16px;}
+  .navbtn{display:block;width:100%;text-align:left;background:transparent;border:none;color:var(--text-dim);font-family:var(--sans);font-size:13px;padding:9px 10px;border-radius:6px;cursor:pointer;margin-bottom:2px;transition:background .12s,color .12s;}
+  .navbtn:hover{background:var(--panel-2);color:var(--text);}
+  .navbtn.active{background:var(--panel-2);color:var(--text);box-shadow:inset 2px 0 0 var(--accent-teal);}
+  .navbtn .locked{float:right;font-size:9.5px;color:var(--text-faint);border:1px solid var(--border);padding:1px 5px;border-radius:3px;}
+
+  /* Main */
+  #main{flex:1;padding:28px 36px;max-width:1180px;}
+  .view{display:none;}
+  .view.active{display:block;}
+  h2{font-size:19px;margin:0 0 4px;font-weight:600;letter-spacing:-0.01em;}
+  .lede{font-size:13px;color:var(--text-dim);margin:0 0 22px;line-height:1.6;max-width:640px;}
+
+  .grid2{display:grid;grid-template-columns:1fr 340px;gap:18px;align-items:start;}
+  .panel{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:18px 20px;}
+  .panel h3{font-size:12.5px;text-transform:none;color:var(--text-dim);margin:0 0 12px;font-weight:600;}
+
+  svg{display:block;}
+  .gridline{stroke:var(--border);stroke-width:1;}
+  .axislabel{fill:var(--text-faint);font-size:10px;font-family:var(--mono);}
+  .well-dot{cursor:pointer;transition:r .1s;}
+  .well-dot:hover{stroke:var(--text);stroke-width:1.5;}
+  .well-line{fill:none;stroke-width:1.4;opacity:.55;}
+  .well-label{font-size:10px;font-family:var(--mono);fill:var(--text-dim);pointer-events:none;}
+
+  table{width:100%;border-collapse:collapse;font-size:12px;}
+  th{text-align:left;color:var(--text-faint);font-weight:500;font-size:10.5px;padding:6px 8px;border-bottom:1px solid var(--border);}
+  td{padding:6px 8px;border-bottom:1px solid rgba(255,255,255,0.04);color:var(--text);font-family:var(--mono);font-size:11.5px;}
+  tr.rowhover:hover{background:var(--panel-2);cursor:pointer;}
+  tr.rowselected{background:var(--panel-2);box-shadow:inset 2px 0 0 var(--accent-teal);}
+  td.na{color:var(--text-faint);}
+
+  .detail-empty{color:var(--text-faint);font-size:12.5px;line-height:1.6;}
+  .detail-id{font-family:var(--mono);font-size:16px;font-weight:600;margin-bottom:2px;}
+  .detail-type{font-size:11px;color:var(--text-dim);margin-bottom:14px;}
+  .kv{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.05);font-size:12px;}
+  .kv .k{color:var(--text-dim);}
+  .kv .v{font-family:var(--mono);color:var(--text);text-align:right;}
+  .cite{font-size:10.5px;color:var(--text-faint);margin-top:14px;padding-top:10px;border-top:1px dashed var(--border);line-height:1.6;}
+  .cite b{color:var(--text-dim);font-weight:600;}
+
+  .flag{background:rgba(212,87,74,0.08);border:1px solid rgba(212,87,74,0.3);border-radius:8px;padding:12px 14px;margin-bottom:10px;}
+  .flag .flagtitle{color:var(--accent-flag);font-size:11.5px;font-weight:600;margin-bottom:4px;}
+  .flag .flagbody{font-size:11.5px;color:var(--text-dim);line-height:1.55;}
+
+  .toggle-row{display:flex;gap:6px;margin-bottom:16px;}
+  .toggle-btn{background:var(--panel-2);border:1px solid var(--border);color:var(--text-dim);font-size:12px;font-family:var(--sans);padding:6px 14px;border-radius:6px;cursor:pointer;}
+  .toggle-btn.active{color:var(--text);border-color:var(--accent-teal);background:rgba(79,184,168,0.08);}
+
+  .legend{display:flex;gap:14px;flex-wrap:wrap;margin-top:10px;font-size:10.5px;color:var(--text-faint);}
+  .legend span{display:inline-flex;align-items:center;gap:5px;}
+  .legend i{width:9px;height:9px;border-radius:2px;display:inline-block;}
+
+  .lockpanel{border:1px dashed var(--border);border-radius:10px;padding:32px 30px;text-align:center;background:var(--panel);}
+  .lockpanel .locktitle{font-size:14px;font-weight:600;margin-bottom:8px;}
+  .lockpanel p{font-size:12.5px;color:var(--text-dim);line-height:1.7;max-width:520px;margin:0 auto 10px;}
+  .lockpanel .reqlist{text-align:left;max-width:460px;margin:16px auto 0;font-size:12px;color:var(--text-dim);}
+  .lockpanel .reqlist li{margin-bottom:6px;}
+
+  .schematic-caption{font-size:10.5px;color:var(--text-faint);margin-top:8px;line-height:1.6;}
+</style>
+</head>
+<body>
+<div id="root">
+
+  <div id="sidebar">
+    <h1>Spatial Feed-Zone & Well Location Viewer</h1>
+    <div class="sub">Fitur 1 — Salak & Sibayak</div>
+    <div class="badge">Visualisasi murni · tanpa diagnostic logic</div>
+    <button class="navbtn active" data-view="sibayak">Sibayak — 10 Sumur</button>
+    <button class="navbtn" data-view="salak">Salak — Penampang Bernama</button>
+    <button class="navbtn" data-view="cloud">Salak — Feed-Zone Cloud <span class="locked">belum dibangun</span></button>
+  </div>
+
+  <div id="main">
+
+    <!-- ============ SIBAYAK VIEW ============ -->
+    <div class="view active" id="view-sibayak">
+      <h2>Sibayak Geothermal Field</h2>
+      <p class="lede">10 sumur (SBY-1 s.d. SBY-10). Setiap titik data tersitasi langsung ke sumber. Klik sumur di tabel atau di chart untuk detail dan sitasi lengkap.</p>
+
+      <div class="grid2">
+        <div>
+          <div class="panel" style="margin-bottom:16px;">
+            <h3>Profil Temperatur vs Kedalaman (MD)</h3>
+            <svg id="sby-chart" width="100%" viewBox="0 0 640 460" preserveAspectRatio="xMidYMid meet"></svg>
+            <div class="legend" id="sby-legend"></div>
+            <div class="schematic-caption">Setiap sumur diplot sebagai 2 titik (temp @ total depth → temp maksimum @ kedalamannya) dihubungkan garis lurus — ini BUKAN kurva profil P-T penuh, karena sumber (Supriyanto 2005, Tabel 1) hanya memberi dua titik data per sumur.</div>
+          </div>
+
+          <div class="panel">
+            <h3>Tabel Data Sumur</h3>
+            <table>
+              <thead><tr>
+                <th>Sumur</th><th>Tipe</th><th>Elev (m ASL)</th><th>TVD (m)</th>
+                <th>Temp@TD (°C)</th><th>Temp Maks (°C)</th><th>Uap 2005 (t/h)</th><th>Injectivity (kg/s·bar)</th>
+              </tr></thead>
+              <tbody id="sby-table"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div>
+          <div class="panel" id="sby-detail" style="margin-bottom:16px;">
+            <h3>Detail Sumur</h3>
+            <div class="detail-empty">Pilih sumur di tabel atau chart untuk melihat detail lengkap dan sitasi sumber.</div>
+          </div>
+
+          <div class="panel" style="margin-bottom:16px;">
+            <h3>Struktur Sesar Terverifikasi</h3>
+            <div style="font-size:12px;color:var(--text-dim);line-height:1.8;">
+              Sesar Tengkorak · Sesar Semangat Gunung · Sesar Pariban (orientasi NW-SE &amp; NE-SW) · Ring fault Kaldera Singkut (jalur recharge utama)
+            </div>
+            <div class="cite"><b>Sumber:</b> Firanda et al., 2024 — "Updating Numerical Simulation Model of Sibayak Field, Indonesia," §2. Koordinat spasial sesar tidak dipublikasikan dalam bentuk numerik di paper ini — hanya nama dan orientasi umum.</div>
+          </div>
+
+          <div class="panel">
+            <h3>Discrepancy Terdeteksi</h3>
+            <div class="flag">
+              <div class="flagtitle">SBY-5 — Flow rate ganda</div>
+              <div class="flagbody">Supriyanto (2005): 57 t/h uap (data pra-produksi). Firanda (2024): 173 t/h brine + 35 t/h uap (data operasional pasca-2008). Dua periode berbeda, bukan kesalahan — tampilkan keduanya dengan label periode.</div>
+            </div>
+            <div class="flag">
+              <div class="flagtitle">SBY-10 — Temperatur ganda</div>
+              <div class="flagbody">Supriyanto (2005): maks 170°C @ 400 m MD. Firanda (2024): disebut sebagai sumur terdingin di lapangan, maks 124°C. Dua sumber belum direkonsiliasi — jangan digabung jadi satu angka.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ SALAK VIEW ============ -->
+    <div class="view" id="view-salak">
+      <h2>Salak — Penampang dengan Sumur Bernama</h2>
+      <p class="lede">Berdasarkan Figure 4 (Golla et al., 2018). Representasi skematik — posisi sumur dibaca dari sumbu gambar terpublikasi, bukan hasil digitasi piksel presisi.</p>
+
+      <div class="toggle-row">
+        <button class="toggle-btn active" data-section="AA">Penampang A-A' (Barat–Timur)</button>
+        <button class="toggle-btn" data-section="BB">Penampang B-B' (Barat Daya–Timur Laut)</button>
+      </div>
+
+      <div class="grid2">
+        <div>
+          <div class="panel" style="margin-bottom:16px;">
+            <h3 id="salak-section-title">Penampang A-A'</h3>
+            <svg id="salak-section" width="100%" viewBox="0 0 640 340" preserveAspectRatio="xMidYMid meet"></svg>
+            <div class="legend" id="salak-legend"></div>
+            <div class="schematic-caption">Posisi sumur = perkiraan berdasarkan sumbu Figure 4 asli (skala ~0–8000, satuan tidak eksplisit di paper). Batas sel termal dan garis clay cap disederhanakan — bukan rekonstruksi kontur presisi.</div>
+          </div>
+        </div>
+
+        <div>
+          <div class="panel" style="margin-bottom:16px;">
+            <h3>Sel Produksi Termal</h3>
+            <table>
+              <thead><tr><th>Sel</th><th>Suhu</th></tr></thead>
+              <tbody>
+                <tr><td>Western</td><td>&ge; 290°C</td></tr>
+                <tr><td>Central</td><td>270–280°C</td></tr>
+                <tr><td>Eastern</td><td>250–260°C</td></tr>
+                <tr><td>Far Eastern</td><td>240–270°C</td></tr>
+              </tbody>
+            </table>
+            <div class="cite"><b>Sumber:</b> Golla et al., 2018, Figure 4, berdasarkan Rohrs et al. (2005).</div>
+          </div>
+
+          <div class="panel">
+            <h3>Profil Sumur Tunggal — AWI 9-9</h3>
+            <div style="font-size:12px;color:var(--text-dim);line-height:1.9;">
+              <div class="kv"><span class="k">Total Depth</span><span class="v">3,171 m MD (2,124 m BSL)</span></div>
+              <div class="kv"><span class="k">Feed-zone 1</span><span class="v">1,884 m MD</span></div>
+              <div class="kv"><span class="k">Feed-zone 2</span><span class="v">1,991–2,143 m MD</span></div>
+              <div class="kv"><span class="k">Feed-zone 3 (terdalam)</span><span class="v">3,058 m MD</span></div>
+              <div class="kv"><span class="k">Suhu @ FZ3</span><span class="v">~325°C</span></div>
+              <div class="kv"><span class="k">Tekanan @ FZ3</span><span class="v">~175 barg</span></div>
+              <div class="kv"><span class="k">Entalpi @ FZ3</span><span class="v">~1,465 kJ/kg</span></div>
+            </div>
+            <div class="cite"><b>Sumber:</b> Golla et al., 2018, §3.1 &amp; Figure 6; Libert, 2017. Satu-satunya sumur di paper dengan profil MD+P+T lengkap.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ FEED-ZONE CLOUD VIEW ============ -->
+    <div class="view" id="view-cloud">
+      <h2>Salak — Feed-Zone Point Cloud</h2>
+      <p class="lede">Berdasarkan Figure 7 &amp; 8 (Golla et al., 2018).</p>
+
+      <div class="lockpanel">
+        <div class="locktitle">Belum dibangun — bukan data placeholder</div>
+        <p>Figure 7 memuat ~300+ titik feed-zone dalam 3 proyeksi ortogonal (peta atas + 2 cross-section), diwarnai berdasarkan 5 kelas Productivity Index (PI'). Titik-titik ini <b style="color:var(--text)">anonim</b> — tanpa identitas sumur — dan pencocokan lintas 3 proyeksi memiliki ambiguitas tinggi di area padat.</p>
+        <p>Menampilkan data acak berlabel "ilustratif" di panel ini akan mengaburkan batas antara data terverifikasi dan data reka-reka — jadi panel ini sengaja dikosongkan sampai proses digitasi selesai.</p>
+        <ul class="reqlist">
+          <li>Digitasi piksel-ke-koordinat untuk 3 proyeksi Figure 7 (peta, cross-section W-E, cross-section S-N)</li>
+          <li>Pencocokan titik lintas-proyeksi dengan skor confidence per titik (tinggi/rendah)</li>
+          <li>Review manual untuk titik dengan >1 kandidat pasangan yang sama plausible-nya</li>
+          <li>Keputusan eksplisit: tampilkan hanya subset top-PI' yang lebih terisolasi, atau seluruh cloud dengan indikator confidence visual</li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// ---------------- DATA (semua tersitasi) ----------------
+const sibayakWells = [
+  {id:'SBY-1', type:'Eksplorasi', elev:1384, tvd:1498, tempTD:243, maxTemp:243, maxTempDepth:1320, steam2005:18, mwe2005:2, injectivity:null,
+    note:null},
+  {id:'SBY-2', type:'Eksplorasi', elev:1384, tvd:2116, tempTD:104, maxTemp:104, maxTempDepth:1650, steam2005:null, mwe2005:null, injectivity:null,
+    note:'Tanpa data produksi (sumur eksplorasi). Firanda (2024) mencatat gradien hidrostatik SBY-2 berbeda dari sumur lain — indikasi pengaruh marginal recharge.'},
+  {id:'SBY-3', type:'Eksplorasi', elev:1468, tvd:1880, tempTD:272, maxTemp:272, maxTempDepth:1780, steam2005:26, mwe2005:3, injectivity:null, note:null},
+  {id:'SBY-4', type:'Development', elev:1468, tvd:1880, tempTD:274, maxTemp:274, maxTempDepth:1610, steam2005:23, mwe2005:3, injectivity:null, note:null},
+  {id:'SBY-5', type:'Development', elev:1384, tvd:1994, tempTD:284, maxTemp:302, maxTempDepth:2025, steam2005:57, mwe2005:6, injectivity:18.6,
+    note:'Flow rate 2024 (Firanda): 173 t/h brine + 35 t/h uap — beda dari angka 2005, lihat panel discrepancy. Feed-zone terdalam di lapangan: -405 s.d. -425 m ASL.'},
+  {id:'SBY-6', type:'Development', elev:1384, tvd:1750, tempTD:251, maxTemp:270, maxTempDepth:1475, steam2005:33, mwe2005:4, injectivity:15.4, note:null},
+  {id:'SBY-7', type:'Development', elev:1384, tvd:2096, tempTD:227, maxTemp:266, maxTempDepth:1600, steam2005:23, mwe2005:3, injectivity:null, note:null},
+  {id:'SBY-8', type:'Development', elev:1384, tvd:1935, tempTD:260, maxTemp:270, maxTempDepth:1800, steam2005:36, mwe2005:4, injectivity:null, note:null},
+  {id:'SBY-9', type:'Development', elev:1337, tvd:1527, tempTD:220, maxTemp:236, maxTempDepth:1350, steam2005:15, mwe2005:2, injectivity:null, note:null},
+  {id:'SBY-10', type:'Development', elev:1468, tvd:2164, tempTD:140, maxTemp:170, maxTempDepth:400, steam2005:null, mwe2005:null, injectivity:null,
+    note:'Supriyanto (2005): maks 170°C @ 400m MD. Firanda (2024) sebut ini sumur terdingin, maks 124°C — dua sumber belum direkonsiliasi.'},
+];
+
+const salakSections = {
+  AA: {
+    title: "Penampang A-A' (Barat–Timur)",
+    wells: [
+      {id:'AWI 20', x:600},
+      {id:'AWI 9', x:2000},
+      {id:'AWI 11', x:3300},
+      {id:'AWI 13', x:4700},
+    ],
+    axisMax: 8000,
+    cells: [
+      {name:'Western', from:0, to:2600, temp:295},
+      {name:'Central', from:2600, to:4600, temp:275},
+      {name:'Eastern', from:4600, to:8000, temp:255},
+    ]
+  },
+  BB: {
+    title: "Penampang B-B' (Barat Daya–Timur Laut)",
+    wells: [
+      {id:'AWI 9', x:1900},
+      {id:'AWI 7', x:4200},
+      {id:'AWI 3', x:5300},
+      {id:'AWI 19', x:6900},
+    ],
+    axisMax: 8000,
+    cells: [
+      {name:'Western', from:0, to:2600, temp:295},
+      {name:'Central', from:2600, to:5000, temp:275},
+      {name:'Far Eastern', from:5000, to:8000, temp:255},
+    ]
+  }
+};
+
+// ---------------- Temperature color scale (grounded in subject: heat) ----------------
+function tempColor(t){
+  const stops = [
+    {t:100, c:[59,126,161]},
+    {t:180, c:[79,184,168]},
+    {t:230, c:[232,178,60]},
+    {t:270, c:[232,130,60]},
+    {t:310, c:[212,69,58]},
+  ];
+  if(t<=stops[0].t) return rgb(stops[0].c);
+  if(t>=stops[stops.length-1].t) return rgb(stops[stops.length-1].c);
+  for(let i=0;i<stops.length-1;i++){
+    const a=stops[i], b=stops[i+1];
+    if(t>=a.t && t<=b.t){
+      const f=(t-a.t)/(b.t-a.t);
+      const c=a.c.map((v,idx)=>Math.round(v+(b.c[idx]-v)*f));
+      return rgb(c);
+    }
+  }
+  return rgb(stops[stops.length-1].c);
+}
+function rgb(c){return `rgb(${c[0]},${c[1]},${c[2]})`;}
+
+// ---------------- Sibayak chart ----------------
+const svgNS = "http://www.w3.org/2000/svg";
+function el(tag, attrs){
+  const e = document.createElementNS(svgNS, tag);
+  for(const k in attrs) e.setAttribute(k, attrs[k]);
+  return e;
+}
+
+const chartPad = {l:56, r:16, t:16, b:36};
+const chartW = 640 - chartPad.l - chartPad.r;
+const chartH = 460 - chartPad.t - chartPad.b;
+const tMin=80, tMax=320, dMin=0, dMax=2200;
+
+function xScale(t){ return chartPad.l + (t-tMin)/(tMax-tMin)*chartW; }
+function yScale(d){ return chartPad.t + (d-dMin)/(dMax-dMin)*chartH; }
+
+let selectedWell = null;
+
+function renderSibayakChart(){
+  const svg = document.getElementById('sby-chart');
+  svg.innerHTML = '';
+
+  // gridlines + axis labels
+  for(let t=100;t<=300;t+=50){
+    svg.appendChild(el('line', {class:'gridline', x1:xScale(t), x2:xScale(t), y1:chartPad.t, y2:chartPad.t+chartH}));
+    const lbl = el('text', {class:'axislabel', x:xScale(t), y:chartPad.t+chartH+16, 'text-anchor':'middle'});
+    lbl.textContent = t; svg.appendChild(lbl);
+  }
+  for(let d=0;d<=2200;d+=500){
+    svg.appendChild(el('line', {class:'gridline', x1:chartPad.l, x2:chartPad.l+chartW, y1:yScale(d), y2:yScale(d)}));
+    const lbl = el('text', {class:'axislabel', x:chartPad.l-10, y:yScale(d)+3, 'text-anchor':'end'});
+    lbl.textContent = d; svg.appendChild(lbl);
+  }
+  const xlab = el('text', {class:'axislabel', x:chartPad.l+chartW/2, y:460-4, 'text-anchor':'middle'});
+  xlab.textContent = 'Temperatur (°C)'; svg.appendChild(xlab);
+  const ylab = el('text', {class:'axislabel', x:12, y:chartPad.t+chartH/2, 'text-anchor':'middle', transform:`rotate(-90 12 ${chartPad.t+chartH/2})`});
+  ylab.textContent = 'Kedalaman MD (m)'; svg.appendChild(ylab);
+
+  sibayakWells.forEach(w=>{
+    const x1=xScale(w.tempTD), y1=yScale(w.tvd);
+    const x2=xScale(w.maxTemp), y2=yScale(w.maxTempDepth);
+    const color = tempColor(w.maxTemp);
+    const line = el('line', {class:'well-line', x1,y1,x2,y2, stroke:color});
+    svg.appendChild(line);
+    [{x:x1,y:y1},{x:x2,y:y2}].forEach(p=>{
+      const dot = el('circle', {class:'well-dot', cx:p.x, cy:p.y, r:4, fill:color, stroke:'#11151a', 'stroke-width':1});
+      dot.addEventListener('click', ()=>selectWell(w.id));
+      svg.appendChild(dot);
+    });
+    const label = el('text', {class:'well-label', x:x2+7, y:y2+3});
+    label.textContent = w.id;
+    label.addEventListener('click', ()=>selectWell(w.id));
+    label.style.cursor='pointer';
+    svg.appendChild(label);
+  });
+}
+
+function renderSibayakLegend(){
+  const legend = document.getElementById('sby-legend');
+  const stops = [100,150,200,250,300];
+  legend.innerHTML = stops.map(t=>`<span><i style="background:${tempColor(t)}"></i>${t}°C</span>`).join('');
+}
+
+function renderSibayakTable(){
+  const tbody = document.getElementById('sby-table');
+  tbody.innerHTML = sibayakWells.map(w=>`
+    <tr class="rowhover" data-id="${w.id}" onclick="selectWell('${w.id}')">
+      <td>${w.id}</td><td>${w.type}</td><td>${w.elev}</td><td>${w.tvd}</td>
+      <td>${w.tempTD ?? '<span class=\"na\">—</span>'}</td>
+      <td>${w.maxTemp}</td>
+      <td>${w.steam2005 ?? '<span class=\"na\">—</span>'}</td>
+      <td>${w.injectivity ?? '<span class=\"na\">—</span>'}</td>
+    </tr>
+  `).join('');
+}
+
+function selectWell(id){
+  selectedWell = id;
+  const w = sibayakWells.find(x=>x.id===id);
+  document.querySelectorAll('#sby-table tr').forEach(r=>r.classList.toggle('rowselected', r.dataset.id===id));
+
+  const detail = document.getElementById('sby-detail');
+  detail.innerHTML = `
+    <h3>Detail Sumur</h3>
+    <div class="detail-id">${w.id}</div>
+    <div class="detail-type">${w.type}</div>
+    <div class="kv"><span class="k">Elevasi wellpad</span><span class="v">${w.elev} m ASL</span></div>
+    <div class="kv"><span class="k">Total depth (TVD)</span><span class="v">${w.tvd} m</span></div>
+    <div class="kv"><span class="k">Temp @ TD</span><span class="v">${w.tempTD ?? '—'}°C</span></div>
+    <div class="kv"><span class="k">Temp maksimum</span><span class="v">${w.maxTemp}°C @ ${w.maxTempDepth} m MD</span></div>
+    <div class="kv"><span class="k">Laju alir uap (2005)</span><span class="v">${w.steam2005 ? w.steam2005+' t/h' : '—'}</span></div>
+    <div class="kv"><span class="k">Output (2005)</span><span class="v">${w.mwe2005 ? w.mwe2005+' MWe' : '—'}</span></div>
+    <div class="kv"><span class="k">Injectivity index</span><span class="v">${w.injectivity ? w.injectivity+' kg/s·bar' : 'tidak dilaporkan'}</span></div>
+    ${w.note ? `<div class="flag" style="margin-top:12px;"><div class="flagbody">${w.note}</div></div>` : ''}
+    <div class="cite"><b>Sumber:</b> Supriyanto et al., 2005, Tabel 1${w.injectivity || (w.note && w.note.includes('Firanda')) ? ' + Firanda et al., 2024' : ''}.</div>
+  `;
+}
+
+// ---------------- Salak section render ----------------
+let currentSection = 'AA';
+const secPad = {l:20, r:20, t:20, b:40};
+const secW = 640 - secPad.l - secPad.r;
+const secH = 340 - secPad.t - secPad.b;
+
+function sx(v, axisMax){ return secPad.l + (v/axisMax)*secW; }
+
+function renderSalakSection(){
+  const data = salakSections[currentSection];
+  document.getElementById('salak-section-title').textContent = data.title;
+  const svg = document.getElementById('salak-section');
+  svg.innerHTML = '';
+
+  const groundY = secPad.t + 40;
+
+  // thermal cells as colored bands along ground
+  data.cells.forEach(c=>{
+    const x1 = sx(c.from, data.axisMax), x2 = sx(c.to, data.axisMax);
+    const band = el('rect', {x:x1, y:groundY, width:x2-x1, height:secH-40, fill:tempColor(c.temp), opacity:0.12});
+    svg.appendChild(band);
+    const lbl = el('text', {class:'axislabel', x:(x1+x2)/2, y:groundY+18, 'text-anchor':'middle'});
+    lbl.textContent = `${c.name} (${c.temp}°C+)`;
+    svg.appendChild(lbl);
+  });
+
+  // ground line
+  svg.appendChild(el('line', {x1:secPad.l, x2:secPad.l+secW, y1:groundY, y2:groundY, stroke:'#3a4450', 'stroke-width':1.5}));
+
+  // wells
+  data.wells.forEach(w=>{
+    const x = sx(w.x, data.axisMax);
+    svg.appendChild(el('line', {x1:x, x2:x, y1:groundY, y2:groundY+secH-40, stroke:'#5c6570', 'stroke-width':1, 'stroke-dasharray':'2,3'}));
+    svg.appendChild(el('circle', {cx:x, cy:groundY, r:4, fill:'var(--accent-teal)'.replace('var(--accent-teal)','#4fb8a8'), stroke:'#11151a'}));
+    const lbl = el('text', {class:'well-label', x:x, y:groundY-8, 'text-anchor':'middle'});
+    lbl.textContent = w.id;
+    svg.appendChild(lbl);
+  });
+
+  const axlbl = el('text', {class:'axislabel', x:secPad.l+secW/2, y:340-8, 'text-anchor':'middle'});
+  axlbl.textContent = "Posisi sepanjang penampang (skala sumbu asli, satuan tidak eksplisit di paper)";
+  svg.appendChild(axlbl);
+}
+
+function renderSalakLegend(){
+  document.getElementById('salak-legend').innerHTML =
+    `<span><i style="background:#4fb8a8"></i>Sumur (posisi perkiraan)</span>
+     <span><i style="background:${tempColor(295)}"></i>Zona termal lebih panas</span>
+     <span><i style="background:${tempColor(255)}"></i>Zona termal lebih dingin</span>`;
+}
+
+// ---------------- init ----------------
+document.querySelectorAll('.navbtn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('.navbtn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+    document.getElementById('view-'+btn.dataset.view).classList.add('active');
+  });
+});
+
+document.querySelectorAll('.toggle-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('.toggle-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    currentSection = btn.dataset.section;
+    renderSalakSection();
+  });
+});
+
+window.selectWell = selectWell;
+
+renderSibayakChart();
+renderSibayakLegend();
+renderSibayakTable();
+renderSalakSection();
+renderSalakLegend();
+</script>
+</body>
+</html>

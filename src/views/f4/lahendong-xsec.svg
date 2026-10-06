@@ -1,0 +1,46 @@
+<!-- Drawing copied unchanged from the F4 prototype (schematic). Hover text lives in fields.json. -->
+<svg class="xsec" viewBox="0 0 860 360" id="lhd-svg">
+          <!-- fault A: inferred NE-SW, dashed -->
+          <line x1="90" y1="60" x2="560" y2="320" stroke="var(--fault-a)" stroke-width="1.4" stroke-dasharray="5 5" opacity="0.7"/>
+          <text x="95" y="52" class="axis-label" fill="var(--fault-a)">FAULT A · inferred NE–SW strike-slip</text>
+
+          <!-- fault B: proven NW-SE thrust, solid -->
+          <line x1="700" y1="40" x2="330" y2="330" stroke="var(--fault-b)" stroke-width="1.8" opacity="0.85"/>
+          <text x="600" y="55" class="axis-label" fill="var(--fault-b)">FAULT B · proven NW–SE thrust</text>
+
+          <!-- red group: increasing dryness -->
+          <g class="hover-target" data-well="LHD18">
+            <circle cx="230" cy="130" r="9" fill="none" stroke="var(--rb)" stroke-width="2.2"/>
+            <circle cx="230" cy="130" r="3" fill="var(--rb)"/>
+            <text x="230" y="112" class="well-label" text-anchor="middle">LHD 18</text>
+          </g>
+          <g class="hover-target" data-well="LHD15">
+            <circle cx="300" cy="175" r="9" fill="none" stroke="var(--rb)" stroke-width="2.2"/>
+            <circle cx="300" cy="175" r="3" fill="var(--rb)"/>
+            <text x="300" y="157" class="well-label" text-anchor="middle">LHD 15</text>
+          </g>
+          <g class="hover-target" data-well="LHD8">
+            <circle cx="345" cy="222" r="9" fill="none" stroke="var(--rb)" stroke-width="2.2"/>
+            <circle cx="345" cy="222" r="3" fill="var(--rb)"/>
+            <text x="345" y="204" class="well-label" text-anchor="middle">LHD 8</text>
+          </g>
+
+          <!-- green group: stable dryness -->
+          <g class="hover-target" data-well="LHD12">
+            <circle cx="440" cy="255" r="9" fill="none" stroke="var(--tier-a)" stroke-width="2.2"/>
+            <circle cx="440" cy="255" r="3" fill="var(--tier-a)"/>
+            <text x="440" y="237" class="well-label" text-anchor="middle">LHD 12</text>
+          </g>
+          <g class="hover-target" data-well="LHD17">
+            <circle cx="520" cy="290" r="9" fill="none" stroke="var(--tier-a)" stroke-width="2.2"/>
+            <circle cx="520" cy="290" r="3" fill="var(--tier-a)"/>
+            <text x="520" y="272" class="well-label" text-anchor="middle">LHD 17</text>
+          </g>
+
+          <!-- yellow group: decreasing dryness -->
+          <g class="hover-target" data-well="LHD11">
+            <circle cx="405" cy="300" r="9" fill="none" stroke="var(--tier-b)" stroke-width="2.2"/>
+            <circle cx="405" cy="300" r="3" fill="var(--tier-b)"/>
+            <text x="405" y="320" class="well-label" text-anchor="middle">LHD 11</text>
+          </g>
+        </svg>

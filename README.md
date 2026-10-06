@@ -1,217 +1,142 @@
-# LithoHub
+# LithoHub v2
 
-**Geothermal Well Anomaly Detection | Real-time P/T Monitoring for Indonesian Energy Operators**
+Geothermal well diagnostics for Indonesian fields. Six features in one web app: an Indonesia field map, per-field feature menus, diagnostics with warning flags, and live data input. All data lives in two JSON files — no data is written inside the code.
 
-![Live Demo](https://lithohub.netlify.app/)
+Every value shows where it comes from. Missing data stays empty — LithoHub never fills gaps with invented numbers.
 
----
+## Run it in VS Code
 
-## The Problem
+You need **Node.js 18 or newer** (download the LTS version from nodejs.org).
 
-Indonesia possesses the world's second largest geothermal potential (~23.9 GW), but only ~2.6 GW is currently installed. The Ministry of Energy & Mineral Resources (ESDM) has set an ambitious target of 9.3 GW by 2035, which is requiring 8x expansion in 14 years. The bottleneck isn't geology or policy. It's operations.
-
-### The Real Cost of Manual Diagnostics
-
-Geothermal wells operate at 200–300°C in corrosive, mineral-rich environments. Wells degrade progressively through:
-- **Casing corrosion** (high-temperature brine attacks metal)
-- **Mineral scaling** (silica & calcite deposits choke flow)
-- **Pressure anomalies** (kinks in P/T gradients signal leaks or blockages)
-- **Chemistry shifts** (chloride spikes indicate casing failure or cold water infiltration)
-
-**Current workflow:** Operators manually normalize 10+ years of historical P/T data, overlay current sensor readings, and spend 60% of diagnostic time trying to determine if a 5% pressure drop is a normal fluctuation or a failure indicator. This is before they can even begin prioritization for expensive workovers ($2M+ per well).
-
-**The gap:** Transparent, contextual anomaly detection doesn't exist in most geothermal operations. Operators either use no detection (reactive failures) or blackbox ML models (unauditable in regulated environments).
-
----
-
-## The Solution
-
-**LithoHub** is a **web-based anomaly detection dashboard** that:
-
-1. **Reads data operators already collect** — Sensor exports (P/T, chlorides) from SCADA systems or Excel
-2. **Detects deviations automatically** — Flags anomalies >1.5σ from 90 day baseline without operator guessing
-3. **Explains each flag with geological context** — Not just "anomaly detected," but "pressure kink at depth = scaling; recommend caliper log"
-4. **Ranks wells by priority** — Combine anomaly severity, asset type, and geology to focus limited inspection budgets
-5. **Uses transparent statistics, not black boxes** — Every threshold, every flag, every recommendation can be audited by regulators
-
-### What Makes It Different
-
-| Aspect | Typical Approach | LithoHub |
-|--------|------------------|----------|
-| **Data input** | Manual spreadsheet review | Auto-read Excel/SCADA export, 30s refresh |
-| **Anomaly detection** | Operator experience ("does this look wrong?") | Quantified: 1.5σ deviation from baseline |
-| **Geological context** | None; treats all wells equally | Asset-type calibration (geothermal 200–310°C normal, oil 60–85°C) |
-| **Root cause hints** | None; just a red flag | Suggests likely cause: "scaling," "corrosion," "cold water infiltration" |
-| **Auditability** | "I think it's risky" | "WHP dropped 8% vs baseline; here's the math" |
-| **Scalability** | One well at a time | 5+ wells on one screen; cross-asset comparison |
-
----
-
-## Key Features
-
-### 🗺️ **Interactive Asset Map**
-- Real-time marker status (🔴 anomaly, 🔵 normal) on Indonesia map
-- Click any marker for detailed asset diagnostics
-- Supports geothermal wells, oil/gas wells, pipelines, processing facilities
-
-### 📊 **90-Day Trend Analysis**
-- **Wellhead Pressure (WHP)** — Detects gradual decline (depletion/scaling)
-- **Temperature** — Flagged if outside asset type safe range
-- **Chloride Concentration (ppm)** — Chemical spike = casing integrity risk
-- Switchable tabs; baseline mean line included
-
-### ⚡ **Geological Context Scoring**
-Each anomaly includes:
-- **Asset-type specific thresholds** (not one size fits all)
-- **Rock formation modifiers** (alluvium scales risk up; granite down)
-- **Interpreted cause** (e.g., "mineral scaling at 1200m depth")
-- **Recommended action** (e.g., "Run caliper log within 30 days")
-
-### 🔄 **Live Excel Feed (Optional)**
-- Python backend reads `lithohub_assets.xlsx` every 30 seconds
-- Operators edit one spreadsheet; dashboard auto-updates
-- Zero API learning curve
-
----
-
-## Quick Start
-
-### **For Industry Users (Just Want to See It Work)**
-
-1. Open [https://lithohub.netlify.app/](https://lithohub.netlify.app/)
-2. View 5 sample assets across Indonesia
-3. Click a marker → See detailed trend charts, anomaly status, geological interpretation
-4. Tab through WHP, Temperature, Chloride metrics
-5. No account needed; no data submission
-
-**Current demo includes:**
-- Kutai Basin Geothermal (normal operation baseline)
-- Madura Strait Oil Well (pressure anomaly detected)
-- Tarakan Basin Gas Well (chemistry shift flagged)
-- Trans Sumatra Pipeline, Barito Processing Facility (mixed asset types)
-
----
-### **Why Not Machine Learning?**
-
-Geothermal operators work in heavily regulated environments (Ministry of ESDM oversight). Black-box ML models (neural networks, ensemble classifiers) cannot be audited by regulators. A chloride spike flagged by a statistical model can be explained to inspectors; a neural network's prediction cannot.
-
-LithoHub uses **descriptive statistics** (mean, std dev, quantile) instead — auditable, explainable, sufficient for v1.0 proof-of-concept.
-
-**Future roadmap** includes: predictive models (time series forecasting, degradation curves) once production data accumulates.
-
----
-
-## Project Structure
+1. Open this folder in VS Code (File → Open Folder).
+2. Open the terminal (View → Terminal) and run:
 
 ```
-lithohub/
-├── index.html              # Main dashboard UI
-├── server.py               # Python backend (anomaly API, Excel reading)
-├── js/
-│   ├── map.js              # Azure Maps initialization & marker management
-│   ├── dashboard.js        # Chart.js integration, UI updates
-│   └── ai-risk.js          # Anomaly scoring & geological context logic
-├── css/
-│   └── style.css           # Dark theme, responsive layout
-├── data/
-│   └── assets.json         # Demo data (5 sample wells/assets)
-└── README.md               # This file
+npm install
+npm run dev
 ```
 
-### **Key Dependencies**
+3. Open the address it prints (usually http://localhost:5173).
 
-| Component | Purpose | License |
-|-----------|---------|---------|
-| [Azure Maps SDK](https://learn.microsoft.com/en-us/azure/azure-maps/) | Interactive geospatial visualization | Commercial (free tier available) |
-| [Chart.js](https://www.chartjs.org/) | Time-series trend charts | MIT |
-| HTML5, CSS3, Vanilla JS | Frontend framework (no Node, no build step) | - |
-| Python 3.8+ | Backend server, anomaly computation | MIT |
+Other commands:
 
-**Zero external API keys required for static demo** — uses public map tiles. Demo deployment on Netlify + optional local Python backend.
+| Command | What it does |
+|---|---|
+| `npm test` | Checks the data files (sources present, values match the prototypes) and that every diagnosis gives the same result as the originals |
+| `npm run build` | Builds the site into `dist/` for hosting (Netlify: build command `npm run build`, publish folder `dist`) |
 
----
+The map tiles and fonts load from the internet, so you need a connection while using the app.
 
-## Validation & Evidence
+## Put it in the GitHub repo and on Netlify
 
-### **Problem Validation**
-- **Direct operator interview** (April 2026): Geothermal field operator confirmed 60% of diagnostic time spent normalizing historical P/T data
-- **Literature review:** SPE 2025 study on Muara Laboh (Indonesia) found automated monitoring workflows still experimental across Indonesia
-- **Regulatory context:** ANSI/ISA-18.2 standard recognizes "alarm fatigue" as cross-sector risk in oil/gas and energy
+v2 is built to slot into the existing `masevs/lithohub` repo. It keeps v1's data architecture: one file, `data/assets.json`, served at the same URL (`/data/assets.json`) and in the same format (an array of assets).
 
-### **Technical Validation**
-- **Dataset:** 5 assets × 46 readings each × 90-day window = 230 synthetic data points (realistic SCADA export format)
-- **Threshold calibration:** 1.5σ rule tested against domain literature (Karlsdottir 2018, Mundhenk et al. 2013 on scaling indicators)
-- **Geological context:** Asset-type thresholds validated against operational ranges cited in geothermal engineering handbooks
+**1. Get the repo and make a branch** (in Command Prompt):
 
----
+```
+git clone https://github.com/masevs/lithohub.git
+cd lithohub
+git checkout -b v2
+```
 
-## Development Roadmap
+**2. Move v1 into a `legacy/` folder** so nothing is lost:
 
-### **v1.0 (Current)**
-- Statistical anomaly detection (1.5σ baseline)
-- Multi-asset-type support (geothermal, oil, gas, pipeline, processing)
-- Geological context scoring
-- Interactive map + trend charts
-- Transparent, auditable thresholds
+```
+mkdir legacy
+git mv index.html js css data server.py legacy/
+```
 
-### **v1.1**
-- Sensor simulation (realistic synthetic readings with temporal patterns)
-- Risk breakdown chart (isolate contribution of each metric: temp vs. pressure vs. chemistry)
-- Maintenance history integration (link anomalies to past workover dates)
+**3. Copy everything from this `lithohub-app` folder into `lithohub/`** (except `node_modules`). Keep the repo's own `README.md` or replace it with this one.
 
-### **v2.0**
-- **Per-asset differentiation:**
-  - Oil/gas: add flow rate, water cut, GOR monitoring
-  - Pipeline: pressure drop, segmentation analysis
-  - Geothermal: dedicated scaling/corrosion chemistry models
-- **Temporal resolution:** Flexible 1h → 24h → 90h aggregation
-- **Three-level map status:** Normal → Warning → Critical (instant visual priority)
+**4. v1 demo assets (optional).** The case-study wells and Kamojang pads are already in `public/data/assets.json`. To also show the v1 demo assets, copy their entries from `legacy/data/assets.json` into it. They load fine: they are not diagnosed and only appear on the map when you tick "Show v1 demo assets".
 
-### **v3.0**
-- **Predictive maintenance:** Time series forecasting to estimate degradation curves before critical thresholds
-- **SCADA historian integration:** Real-time data streaming (replaces Excel)
-- **Alert system:** Email/SMS notifications at warning + critical thresholds
-- **Regulatory audit trail:** Logged decisions, recommendation timestamps, operator actions
+**5. Test, then push:**
 
-### **v4.0+ (Vision)**
-- Cross-asset predictive models (well lifespan remaining given current degradation rate)
-- Economic ROI calculator (is repair worth the cost, or let well decline?)
-- National-scale asset inventory (200+ wells across multiple operators)
+```
+npm install
+npm test
+npm run dev
+git add .
+git commit -m "LithoHub v2: six features in one app"
+git push -u origin v2
+```
 
----
+**6. Netlify.** The included `netlify.toml` tells Netlify to run `npm run build` and publish `dist/`. Netlify builds a preview for the `v2` branch if branch deploys are on (Site configuration → Build & deploy → Branches). When you are happy, merge `v2` into `main` on GitHub, and lithohub.netlify.app switches to v2 automatically.
 
-## For Industry Operators: Getting Started
+## Editing the data
 
-### **If You're a Geothermal Operator:**
-1. **Export your SCADA historian** for one well (90-day rolling window of P/T, chloride)
-2. **Convert to assets.json format** (template above)
-3. **Test locally:** `python3 server.py` → open http://localhost:8000
-4. **Share feedback:** Does the anomaly detection make sense? Are the thresholds right? What features would you add?
+There are two data files. Change them and refresh the page — no code change needed.
 
-### **If You're a Regulator:**
-- The anomaly detection logic is **fully transparent**: no black boxes, no proprietary models
-- All thresholds and calculations are **open source** and can be audited
-- Logs can be extended to include operator decisions, inspector notes, and regulatory approval stamps
+| File | What it holds | Used by |
+|---|---|---|
+| `public/data/assets.json` | Wells with a diagnosis (same file and format as v1) | F3 rule engine, F5, F6 |
+| `public/data/fields.json` | Field information (name, region, map location) and field-level datasets | F1, F2, F3 facts, F4 |
 
-### **If You're an Investor/Stakeholder:**
-- This addresses a **documented gap** in Indonesia's geothermal expansion pipeline
-- The technology is **immediately deployable** (no massive R&D needed)
-- The market is **national scale**: 200+ geothermal wells, expanding to oil/gas (1000+ wells)
-- Revenue streams: SaaS dashboard (per well/month) + consulting on threshold tuning + alerts API
+**Every dataset carries its evidence and source**, for example:
 
----
+```json
+"permeabilityAnisotropy": {
+  "evidence": "quoted",
+  "source": "Nordquist (2017), via Kurniawan et al. (2026), SGP-TR-230, §2.2.1",
+  "confidence": "A1",
+  "note": "...",
+  "values": [ ... ]
+}
+```
 
-## License
+`evidence` is one of: `quoted` (number from a paper's text or table), `digitized` (read from a figure), `reconstructed` (shape matched to reported statistics), `illustrative` (not real data), `derived` (LithoHub calculation or estimate), `pending` (not available yet — shown as a dashed card). A feature tab is enabled when its datasets have real data, labeled "Demo data" when they are only illustrative, and "Pending" when nothing is available yet. `npm test` fails if a dataset with values has no `source`.
 
-MIT License — Free for educational, research, and commercial use. See [LICENSE](./LICENSE) for full terms.
+**How a well in assets.json gets its diagnosis** (same order as v1's `computeAnomalies()`):
 
----
+| The asset has | Diagnosis | Shown in |
+|---|---|---|
+| `productionHistory` | Production decline (Salak logic) | Well health |
+| `geochemicalHistory` | Injectate breakthrough (Silangkitang logic) | Ternary, isotope & tracer |
+| `anomalyType: "casing_leak_cold_influx"` | Reported by source (Ulubelu) | Well health |
+| `geochemicalTrend` | Boiling / dryness (Lahendong logic) | Well health |
+| `superheatSeries` | Superheat rule engine (F3) | Superheat & thermal |
 
-## Questions? Ideas?
+Add `"field": "salak"` (or another field id from fields.json) to put a well under a field. A well whose series has `"evidence": "illustrative"` is shown as demo data and never counts as an alert — until a user enters their own values. Both files must be valid JSON: no trailing commas. If one isn't, the app shows which file is broken instead of a blank page.
 
-- **For technical questions and Contributors are welcome in:** Open an [Issue](https://github.com/masevs/lithohub/issues) Email imasviestawati22@gmail.com
-- **To see a live demo:** Visit [https://lithohub.netlify.app/](https://lithohub.netlify.app/)
+## What's inside
 
----
+```
+public/data/
+  assets.json             wells with a diagnosis — same file and format as v1
+  fields.json             field info + all F1–F4 datasets, each with evidence and source
+prototypes/               the original F1–F4 prototype files, kept for audit (not built)
+netlify.toml              Netlify build settings
+src/
+  App.jsx                 loads both data files, runs all diagnoses, computes field colors
+  data/
+    model.js              builds fields, wells and feature states from the two files
+    features.js           the 6 features and their notes
+    schemas.js            which tables a user can edit, per diagnosis
+    store.js              user data (saved in the browser, separate from paper data)
+  diagnostics/            F3/F5/F6 rule logic ported unchanged from the prototypes + tests
+  views/                  F1–F4 rebuilt as app views (F4 reuses the two original drawings)
+  components/             map, side menu, alert bar, panels, charts, data editor
+```
 
-**LithoHub v1.0** | May 2026 | Built by Imas Viestawati for Indonesia's Energy Transition
+## How the parts work
+
+**Map and colors.** Each field marker shows the worst diagnosis among its wells. Fields with only visualizations get an orange marker. Kamojang has only illustrative data, so it gets a dashed "demo data" marker and never counts as an alert.
+
+**Diagnoses.** `src/diagnostics/` holds the four v1 diagnoses (Salak, Lahendong, Silangkitang, Ulubelu) and the F3 superheat rule engine. The calculations are the same as in the originals; the thresholds were moved into a `RULES` list so the app can show them, labeled as LithoHub rule parameters. Two small guards were added so empty user tables return "No data" instead of crashing.
+
+**Data input.** On F3 (each Kamojang pad), F5 and F6, "Enter your data" opens an editable table. You can type values, upload a CSV, paste a CSV, or download a template. Rows with errors are highlighted and saving is blocked until they are fixed. After saving, the diagnosis, map color, and alert bar update immediately. "Paper data / My data" switches between the two; your data never overwrites the paper data. It is stored in your browser only (localStorage).
+
+## Adding a new kind of diagnosis
+
+Add a file in `src/diagnostics/`, register it in `diagnostics/index.js`, add its detection rule to `pickDiagnosis()` in `src/data/model.js`, add its editable tables to `schemas.js`, and add a test.
+
+## Known open items
+
+- **F1** is a 2D viewer. The 3D trajectories need directional surveys; the Salak feed-zone cloud needs Figure 7 of Golla (2018) digitized. Both show as dashed "pending" cards listing what is needed.
+- **F1 Sibayak depths:** the source table gives total depth as TVD but the maximum-temperature depth in m MD, and the chart puts both on one axis. Verify against Supriyanto (2005).
+- **F2** rose diagram (Salak) and PI′ curve are reconstructed shapes, now tagged as such. The Lahendong 1500 µS/cm split line has no stated source — verify it.
+- **F3** Kamojang series are illustrative. Replace them in `assets.json` with digitized or logged values (and change `"evidence"` to `"digitized"`) to make the rule engine count. The 24 °C / 10 °C corrosion thresholds need a citation.
+- **F6** ternary and isotope plots are pending: they need per-sample Cl, SO₄, HCO₃, Na, K, Mg and δ¹⁸O / δ²H.
+- **Map locations** for Sibayak and Kamojang are approximate field-level points, not from the source papers.
+- **v1 bug carried over:** the diagnosis functions leave `summary` as "No anomalies detected" even when they find one. The app does not display it.
+- **Backend:** user data lives in the browser. To share data between users, replace `loadUserData`/`saveUserData` in `src/data/store.js` with calls to a server.

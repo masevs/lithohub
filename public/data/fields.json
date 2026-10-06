@@ -1,0 +1,926 @@
+{
+  "_about": "Field-level data for LithoHub features F1–F4. Every dataset has evidence + source. Evidence: quoted | digitized | reconstructed | illustrative | derived | pending. Well-level diagnostic data lives in assets.json.",
+  "salak": {
+    "name": "Salak",
+    "region": "West Java",
+    "features": {
+      "f1": {
+        "crossSections": {
+          "evidence": "reconstructed",
+          "source": "Golla et al. (2018), Figure 4, based on Rohrs et al. (2005)",
+          "note": "Schematic. Well positions are estimated from the axes of the published Figure 4 (scale ~0–8000, unit not stated in the paper), not precise pixel digitization. Thermal-cell boundaries and the clay cap are simplified.",
+          "sections": [
+            {
+              "id": "A-A",
+              "title": "Section A-A' (West–East)",
+              "axisMax": 8000,
+              "wells": [
+                {
+                  "id": "AWI 20",
+                  "x": 600
+                },
+                {
+                  "id": "AWI 9",
+                  "x": 2000
+                },
+                {
+                  "id": "AWI 11",
+                  "x": 3300
+                },
+                {
+                  "id": "AWI 13",
+                  "x": 4700
+                }
+              ],
+              "cells": [
+                {
+                  "name": "Western",
+                  "from": 0,
+                  "to": 2600,
+                  "tempRangeC": "≥ 290",
+                  "displayTempC": 295
+                },
+                {
+                  "name": "Central",
+                  "from": 2600,
+                  "to": 4600,
+                  "tempRangeC": "270–280",
+                  "displayTempC": 275
+                },
+                {
+                  "name": "Eastern",
+                  "from": 4600,
+                  "to": 8000,
+                  "tempRangeC": "250–260",
+                  "displayTempC": 255
+                }
+              ]
+            },
+            {
+              "id": "B-B",
+              "title": "Section B-B' (Southwest–Northeast)",
+              "axisMax": 8000,
+              "wells": [
+                {
+                  "id": "AWI 9",
+                  "x": 1900
+                },
+                {
+                  "id": "AWI 7",
+                  "x": 4200
+                },
+                {
+                  "id": "AWI 3",
+                  "x": 5300
+                },
+                {
+                  "id": "AWI 19",
+                  "x": 6900
+                }
+              ],
+              "cells": [
+                {
+                  "name": "Western",
+                  "from": 0,
+                  "to": 2600,
+                  "tempRangeC": "≥ 290",
+                  "displayTempC": 295
+                },
+                {
+                  "name": "Central",
+                  "from": 2600,
+                  "to": 5000,
+                  "tempRangeC": "270–280",
+                  "displayTempC": 275
+                },
+                {
+                  "name": "Far Eastern",
+                  "from": 5000,
+                  "to": 8000,
+                  "tempRangeC": "240–270",
+                  "displayTempC": 255
+                }
+              ]
+            }
+          ]
+        },
+        "singleWellProfile": {
+          "evidence": "quoted",
+          "source": "Golla et al. (2018), §3.1 & Figure 6; Libert (2017)",
+          "note": "The only well in the paper with a complete MD + P + T profile.",
+          "well": "AWI 9-9",
+          "totalDepth": {
+            "md": 3171,
+            "bslM": 2124
+          },
+          "feedZones": [
+            {
+              "name": "Feed zone 1",
+              "mdM": 1884
+            },
+            {
+              "name": "Feed zone 2",
+              "mdFromM": 1991,
+              "mdToM": 2143
+            },
+            {
+              "name": "Feed zone 3 (deepest)",
+              "mdM": 3058
+            }
+          ],
+          "atDeepestFeedZone": {
+            "tempC": 325,
+            "pressureBarg": 175,
+            "enthalpyKjKg": 1465,
+            "approximate": true
+          }
+        },
+        "feedZoneCloud": {
+          "evidence": "pending",
+          "source": "Golla et al. (2018), Figures 7 & 8",
+          "note": "Figure 7 holds ~300+ feed-zone points in 3 orthogonal projections (map view + 2 cross-sections), colored by 5 productivity-index (PI′) classes. The points are anonymous (no well identity) and matching them across the 3 projections is highly ambiguous in dense areas. This panel stays empty until digitization is done — random points labeled \"illustrative\" would blur the line between verified and invented data.",
+          "todo": [
+            "Pixel-to-coordinate digitization of the 3 projections of Figure 7 (map, W-E section, S-N section)",
+            "Cross-projection point matching with a confidence score per point (high/low)",
+            "Manual review of points with more than one equally plausible match",
+            "Explicit decision: show only the more isolated top-PI′ subset, or the whole cloud with a visual confidence indicator"
+          ]
+        },
+        "trajectory3d": {
+          "evidence": "pending",
+          "note": "Needs wellhead coordinates (UTM), KB elevation and a directional survey (MD, inclination, azimuth) per well. Not yet found in the source papers."
+        }
+      },
+      "f2": {
+        "fractureStats": {
+          "evidence": "quoted",
+          "source": "Golla et al. (2018), Geothermics 83 — Figures 9–10",
+          "confidence": "A1",
+          "note": "12 of 18 logged wells fall inside the commercial production boundary — only those 12 feed this analysis.",
+          "wellsInBoundary": 12,
+          "wellsTotal": 18,
+          "cumulativeLogLengthM": 9612,
+          "sHmaxAzimuthDeg": 22,
+          "sHmaxLabel": "N22°E",
+          "openFractures": 4900,
+          "effectiveFractures": {
+            "value": 100,
+            "approximate": true
+          },
+          "correlatedToFeedZonesPercent": {
+            "value": 2,
+            "approximate": true
+          }
+        },
+        "fractureRose": {
+          "evidence": "reconstructed",
+          "source": "Golla et al. (2018), Figures 9–10",
+          "note": "Reconstructed concentration lobe from reported strike/dip statistics (NE–SW dominant, dip > 60°) — not digitized from the original stereonet. Real per-fracture coordinates were not published.",
+          "method": "gaussian lobe, 10° bins, symmetric about the strike axis",
+          "open": {
+            "centerDeg": 22,
+            "spreadDeg": 34,
+            "peak": 10,
+            "floor": 2.4
+          },
+          "effective": {
+            "centerDeg": 22,
+            "spreadDeg": 16,
+            "peak": 10,
+            "floor": 0.3
+          },
+          "displayMax": 12.6
+        },
+        "permeabilityAnisotropy": {
+          "evidence": "quoted",
+          "source": "Nordquist (2017), via Kurniawan et al. (2026), SGP-TR-230, §2.2.1",
+          "confidence": "A1",
+          "note": "Fracture flow is 2.5× more transmissive along strike than across it — matched grid orientation (NE) in the reservoir model.",
+          "values": [
+            {
+              "label": "ky — NE-SW (parallel to S_Hmax)",
+              "ratio": 2.5
+            },
+            {
+              "label": "kx — NW-SE (perpendicular to S_Hmax)",
+              "ratio": 1
+            }
+          ]
+        },
+        "meqReservoirBase": {
+          "evidence": "quoted",
+          "source": "Perdana et al. (2020), WGC Reykjavik — §2, Figure 4",
+          "confidence": "B",
+          "note": "Interpreted as imaging the stimulated/connected fracture network extent — a correlative reading of MEQ clustering, not a direct fracture count.",
+          "unit": "m relative to sea level",
+          "zones": [
+            {
+              "zone": "West (injection-related)",
+              "top": -500,
+              "base": -4500,
+              "note": "Brine (Awi 9) & condensate (Awi 18/20) injection"
+            },
+            {
+              "zone": "East (production-related)",
+              "top": 500,
+              "base": -1000,
+              "note": "Steam-cap compaction, shallow feed zones"
+            }
+          ]
+        },
+        "productivityIndex": {
+          "evidence": "reconstructed",
+          "source": "Kurniawan et al. (2026), Figure 3",
+          "note": "Reconstructed S-curve shape matched to the documented range (280+ calibrated feed zones, PI′ 1.4×10⁻⁴ – 8×10⁻³); not digitized from the source plot.",
+          "unit": "kph·cuft·cp / lb / psi",
+          "points": [
+            {
+              "pi": 0.00014,
+              "cum": 2
+            },
+            {
+              "pi": 0.0003,
+              "cum": 6
+            },
+            {
+              "pi": 0.0007,
+              "cum": 14
+            },
+            {
+              "pi": 0.0013,
+              "cum": 28
+            },
+            {
+              "pi": 0.002,
+              "cum": 45
+            },
+            {
+              "pi": 0.003,
+              "cum": 62
+            },
+            {
+              "pi": 0.0045,
+              "cum": 78
+            },
+            {
+              "pi": 0.006,
+              "cum": 90
+            },
+            {
+              "pi": 0.008,
+              "cum": 98
+            }
+          ]
+        },
+        "trajectoryChecker": {
+          "evidence": "pending",
+          "note": "Golla et al. (2018) recommends NW or E-SE trajectories qualitatively — no exact azimuth range is published. A prior draft invented 310–320° / 110–120° cutoffs; that number was not sourced and has been removed pending a checker built directly from a measured rose diagram."
+        },
+        "mohrCoulomb": {
+          "evidence": "pending",
+          "note": "Requires the full stress tensor (S_v, S_Hmax magnitude, S_hmin, pore pressure). Neither Golla (2018) nor Kurniawan (2026) publishes these magnitudes — only the S_Hmax orientation (N22°E) is known."
+        }
+      }
+    }
+  },
+  "sibayak": {
+    "name": "Sibayak",
+    "region": "North Sumatra",
+    "lat": 3.23,
+    "lng": 98.5,
+    "coordinateNote": "Approximate field-level location for the map only — not from LithoHub source papers. Verify before publishing.",
+    "features": {
+      "f1": {
+        "wells": {
+          "evidence": "quoted",
+          "source": "Supriyanto et al. (2005), Table 1; injectivity index from Firanda et al. (2024)",
+          "note": "Each well has only two data points in the source (temperature at total depth, and maximum temperature at its depth). The chart joins them with a straight line — it is NOT a full P-T profile.",
+          "columnNote": "The source table gives total depth as TVD, while the maximum-temperature depth is given in m MD. Verify against the paper before mixing the two on one axis.",
+          "wells": [
+            {
+              "id": "SBY-1",
+              "type": "Exploration",
+              "elevM": 1384,
+              "tvdM": 1498,
+              "tempTDC": 243,
+              "maxTempC": 243,
+              "maxTempDepthM": 1320,
+              "steam2005Tph": 18,
+              "mwe2005": 2,
+              "injectivityKgSBar": null,
+              "note": null
+            },
+            {
+              "id": "SBY-2",
+              "type": "Exploration",
+              "elevM": 1384,
+              "tvdM": 2116,
+              "tempTDC": 104,
+              "maxTempC": 104,
+              "maxTempDepthM": 1650,
+              "steam2005Tph": null,
+              "mwe2005": null,
+              "injectivityKgSBar": null,
+              "note": "No production data (exploration well). Firanda (2024) notes that the hydrostatic gradient of SBY-2 differs from the other wells — an indication of marginal recharge influence."
+            },
+            {
+              "id": "SBY-3",
+              "type": "Exploration",
+              "elevM": 1468,
+              "tvdM": 1880,
+              "tempTDC": 272,
+              "maxTempC": 272,
+              "maxTempDepthM": 1780,
+              "steam2005Tph": 26,
+              "mwe2005": 3,
+              "injectivityKgSBar": null,
+              "note": null
+            },
+            {
+              "id": "SBY-4",
+              "type": "Development",
+              "elevM": 1468,
+              "tvdM": 1880,
+              "tempTDC": 274,
+              "maxTempC": 274,
+              "maxTempDepthM": 1610,
+              "steam2005Tph": 23,
+              "mwe2005": 3,
+              "injectivityKgSBar": null,
+              "note": null
+            },
+            {
+              "id": "SBY-5",
+              "type": "Development",
+              "elevM": 1384,
+              "tvdM": 1994,
+              "tempTDC": 284,
+              "maxTempC": 302,
+              "maxTempDepthM": 2025,
+              "steam2005Tph": 57,
+              "mwe2005": 6,
+              "injectivityKgSBar": 18.6,
+              "note": "2024 flow rate (Firanda): 173 t/h brine + 35 t/h steam — differs from the 2005 figure, see the discrepancy panel. Deepest feed zone in the field: −405 to −425 m ASL."
+            },
+            {
+              "id": "SBY-6",
+              "type": "Development",
+              "elevM": 1384,
+              "tvdM": 1750,
+              "tempTDC": 251,
+              "maxTempC": 270,
+              "maxTempDepthM": 1475,
+              "steam2005Tph": 33,
+              "mwe2005": 4,
+              "injectivityKgSBar": 15.4,
+              "note": null
+            },
+            {
+              "id": "SBY-7",
+              "type": "Development",
+              "elevM": 1384,
+              "tvdM": 2096,
+              "tempTDC": 227,
+              "maxTempC": 266,
+              "maxTempDepthM": 1600,
+              "steam2005Tph": 23,
+              "mwe2005": 3,
+              "injectivityKgSBar": null,
+              "note": null
+            },
+            {
+              "id": "SBY-8",
+              "type": "Development",
+              "elevM": 1384,
+              "tvdM": 1935,
+              "tempTDC": 260,
+              "maxTempC": 270,
+              "maxTempDepthM": 1800,
+              "steam2005Tph": 36,
+              "mwe2005": 4,
+              "injectivityKgSBar": null,
+              "note": null
+            },
+            {
+              "id": "SBY-9",
+              "type": "Development",
+              "elevM": 1337,
+              "tvdM": 1527,
+              "tempTDC": 220,
+              "maxTempC": 236,
+              "maxTempDepthM": 1350,
+              "steam2005Tph": 15,
+              "mwe2005": 2,
+              "injectivityKgSBar": null,
+              "note": null
+            },
+            {
+              "id": "SBY-10",
+              "type": "Development",
+              "elevM": 1468,
+              "tvdM": 2164,
+              "tempTDC": 140,
+              "maxTempC": 170,
+              "maxTempDepthM": 400,
+              "steam2005Tph": null,
+              "mwe2005": null,
+              "injectivityKgSBar": null,
+              "note": "Supriyanto (2005): max 170°C @ 400 m MD. Firanda (2024) describes this as the coldest well, max 124°C — the two sources have not been reconciled."
+            }
+          ]
+        },
+        "discrepancies": {
+          "evidence": "quoted",
+          "source": "Supriyanto et al. (2005); Firanda et al. (2024)",
+          "items": [
+            {
+              "well": "SBY-5",
+              "topic": "Flow rate",
+              "records": [
+                {
+                  "source": "Supriyanto (2005)",
+                  "period": "pre-production",
+                  "value": "57 t/h steam"
+                },
+                {
+                  "source": "Firanda (2024)",
+                  "period": "operational, after 2008",
+                  "value": "173 t/h brine + 35 t/h steam"
+                }
+              ],
+              "resolution": "Two different periods, not an error — show both with their period labels."
+            },
+            {
+              "well": "SBY-10",
+              "topic": "Temperature",
+              "records": [
+                {
+                  "source": "Supriyanto (2005)",
+                  "value": "max 170°C @ 400 m MD"
+                },
+                {
+                  "source": "Firanda (2024)",
+                  "value": "coldest well in the field, max 124°C"
+                }
+              ],
+              "resolution": "Not yet reconciled — do not merge into one number."
+            }
+          ]
+        },
+        "faults": {
+          "evidence": "quoted",
+          "source": "Firanda et al. (2024), \"Updating Numerical Simulation Model of Sibayak Field, Indonesia\", §2",
+          "note": "Fault coordinates are not published numerically — only names and general orientation.",
+          "items": [
+            "Tengkorak Fault",
+            "Semangat Gunung Fault",
+            "Pariban Fault (NW-SE & NE-SW orientation)",
+            "Singkut Caldera ring fault (main recharge path)"
+          ]
+        }
+      },
+      "f2": {
+        "namedStructures": {
+          "evidence": "pending",
+          "confidence": "C",
+          "source": "Firanda et al. (2024), 49th Stanford Geothermal Workshop — name-level only",
+          "note": "Fault names were confirmed against Firanda et al. (2024) via search snippets only — the full PDF has not been read line by line. No quantitative claims (strike/dip, permeability, stress) until that verification is done.",
+          "items": [
+            "Sesar Tengkorak",
+            "Sesar Semangat Gunung",
+            "Sesar Pariban (NW–SE & NE–SW)",
+            "Kaldera Singkut (ring fault)"
+          ]
+        },
+        "allPanels": {
+          "evidence": "pending",
+          "note": "Rose diagram, effective-fracture filter and stress orientation will be added once the primary PDF is read in full and cross-checked."
+        }
+      }
+    }
+  },
+  "lahendong": {
+    "name": "Lahendong",
+    "region": "North Sulawesi",
+    "features": {
+      "f2": {
+        "faultStrikes": {
+          "evidence": "quoted",
+          "source": "Suherlina et al. (2022), Geothermics 105 — Table 1, §4.1",
+          "confidence": "A2",
+          "note": "σ1 (S_Hmax) trends NNW-SSE, inferred from Riedel-shear kinematics on the mapped fault set — a structural interpretation, not an instrumented stress measurement.",
+          "faults": [
+            {
+              "no": 1,
+              "region": "West",
+              "strike": 100
+            },
+            {
+              "no": 2,
+              "region": "West",
+              "strike": 50
+            },
+            {
+              "no": 3,
+              "region": "West",
+              "strike": 130
+            },
+            {
+              "no": 4,
+              "region": "West",
+              "strike": 0
+            },
+            {
+              "no": 5,
+              "region": "West",
+              "strike": 80
+            },
+            {
+              "no": 6,
+              "region": "West",
+              "strike": 165
+            },
+            {
+              "no": 7,
+              "region": "North",
+              "strike": 150
+            },
+            {
+              "no": 8,
+              "region": "North",
+              "strike": 170
+            },
+            {
+              "no": 9,
+              "region": "North",
+              "strike": 50
+            },
+            {
+              "no": 10,
+              "region": "North",
+              "strike": 170
+            },
+            {
+              "no": 11,
+              "region": "East",
+              "strike": 5
+            },
+            {
+              "no": 12,
+              "region": "East",
+              "strike": 40
+            },
+            {
+              "no": 13,
+              "region": "East",
+              "strike": 51
+            },
+            {
+              "no": 14,
+              "region": "East",
+              "strike": 80
+            },
+            {
+              "no": 15,
+              "region": "East",
+              "strike": 350
+            },
+            {
+              "no": 16,
+              "region": "East",
+              "strike": 225
+            },
+            {
+              "no": 17,
+              "region": "East",
+              "strike": 200
+            }
+          ]
+        },
+        "compartments": {
+          "evidence": "quoted",
+          "source": "Brehme et al. (2016), Grundwasser 21 + Suherlina et al. (2022), Table 3",
+          "confidence": "B",
+          "note": "Two compartments confirmed across independent studies: acidic / high-gas / fault-permeable vs. neutral / lower-productivity. 7 wells sampled in 2018.",
+          "referenceLineEcUsCm": {
+            "value": 1500,
+            "note": "Split line carried over from the prototype; its source is not stated — verify."
+          },
+          "wells": [
+            {
+              "well": "LHD 5",
+              "pH": 8.7,
+              "ecUsCm": 1847
+            },
+            {
+              "well": "LHD 8",
+              "pH": 6.87,
+              "ecUsCm": 2130
+            },
+            {
+              "well": "LHD 11",
+              "pH": 7.77,
+              "ecUsCm": 1154
+            },
+            {
+              "well": "LHD 12",
+              "pH": 4.79,
+              "ecUsCm": 1380
+            },
+            {
+              "well": "LHD 18",
+              "pH": 7.36,
+              "ecUsCm": 2550
+            },
+            {
+              "well": "LHD 37",
+              "pH": 8.44,
+              "ecUsCm": 1962
+            },
+            {
+              "well": "LHD 48",
+              "pH": 6.15,
+              "ecUsCm": 1079
+            }
+          ]
+        },
+        "poissonRatio": {
+          "evidence": "quoted",
+          "source": "Silitonga et al. (2005), WGC Antalya — via Qarinur et al. (2020), Table 4",
+          "confidence": "B",
+          "note": "Higher ν near the surface = fractured rock; lower ν at depth = silicified, unfractured rock.",
+          "formations": [
+            {
+              "name": "Post-Tondano / Pangolombian",
+              "topM": 0,
+              "baseM": 850,
+              "nu": 0.4
+            },
+            {
+              "name": "Tondano",
+              "topM": 350,
+              "baseM": 1100,
+              "nu": 0.35
+            },
+            {
+              "name": "Pre-Tondano",
+              "topM": 1100,
+              "baseM": 1600,
+              "nu": 0.3
+            }
+          ]
+        },
+        "thermalForecast": {
+          "evidence": "quoted",
+          "source": "Qarinur et al. (2020)",
+          "confidence": "B",
+          "note": "Only the start and end values are from the source. The line between them is drawn for reading only; it is not a modeled year-by-year curve.",
+          "wells": [
+            {
+              "well": "LHD-11",
+              "cluster": "Cluster-4",
+              "start": {
+                "years": 0,
+                "tempC": 275
+              },
+              "end": {
+                "years": 36,
+                "tempC": 248
+              }
+            },
+            {
+              "well": "LHD-17",
+              "cluster": "Cluster-13",
+              "start": {
+                "years": 0,
+                "tempC": 282
+              },
+              "end": {
+                "years": 30,
+                "tempC": 238
+              }
+            }
+          ]
+        }
+      },
+      "f4": {
+        "crossSection": {
+          "evidence": "reconstructed",
+          "source": "Suherlina, Newson, Kamah & Brehme (2022), Geothermics 105 — Fig. 7, Fig. 16 & Conclusion",
+          "confidence": "B",
+          "note": "Static schematic with hover data. No XYZ grid — not a slicing engine.",
+          "caveats": [
+            {
+              "title": "Fault-to-well proximity is inconsistent within the source itself",
+              "text": "The Discussion section places the proven thrust fault (Fault B) near LHD 12; the Conclusion places it near LHD 8. This diagram follows the Discussion-section version."
+            },
+            {
+              "title": "The general and local framings disagree",
+              "text": "At field scale, the paper states NW-SE thrust faults generally admit fluid flow to production wells, while the NE-SW fault (Fault A) is the general barrier. Only in the local LHD 8/11/12/18 compartmentalization discussion are both faults treated jointly as barriers — which is what this diagram shows."
+            }
+          ],
+          "groups": {
+            "increasing": "Increasing dryness — lack of recharge",
+            "stable": "Stable dryness — adequate recharge",
+            "decreasing": "Decreasing dryness — strongest fluid inflow"
+          },
+          "wells": [
+            {
+              "well": "LHD 8",
+              "svgId": "LHD8",
+              "dryness": "increasing",
+              "cl2012": 347,
+              "cl2018": 449,
+              "reading": "Rising Cl, dropping SO₄ — boiling dry",
+              "detail": "Cl 347→449 mg/l (2012–2018), SO₄ falling. Shallowest feed zone; boiling due to pressure drawdown."
+            },
+            {
+              "well": "LHD 15",
+              "svgId": "LHD15",
+              "dryness": "increasing",
+              "cl2012": null,
+              "cl2018": null,
+              "reading": "Deeper feed zone, still dries fast",
+              "detail": "Deeper feed zone than LHD 8 but still dries fast — depth of feed zone is not the key driver."
+            },
+            {
+              "well": "LHD 18",
+              "svgId": "LHD18",
+              "dryness": "increasing",
+              "cl2012": null,
+              "cl2018": null,
+              "reading": "Strongest EC / Cl rise in the group",
+              "detail": "Shallowest feed zone of the enhanced-dryness wells; strongest chloride and EC rise in the cluster."
+            },
+            {
+              "well": "LHD 12",
+              "svgId": "LHD12",
+              "dryness": "stable",
+              "cl2012": 466,
+              "cl2018": 355,
+              "reading": "Lowered Cl, raised SO₄ — inflow signal",
+              "detail": "Cl 466→355 mg/l, SO₄ rising — indicates fluid inflow from the injection site. Acts differently from the drier wells on pH, EC and mass flow."
+            },
+            {
+              "well": "LHD 17",
+              "svgId": "LHD17",
+              "dryness": "stable",
+              "cl2012": null,
+              "cl2018": null,
+              "reading": "Turned dry-steam well by Apr 2018",
+              "detail": "Turned into a dry-steam well by April 2018 despite the 'stable' classification from the 2013/2015 dataset."
+            },
+            {
+              "well": "LHD 11",
+              "svgId": "LHD11",
+              "dryness": "decreasing",
+              "cl2012": 337,
+              "cl2018": 193,
+              "reading": "Deepest feed zone, clearest inflow",
+              "detail": "Cl 337→193 mg/l, SO₄ rising — clearest fluid-inflow signal. Deepest feed zone of all sampled wells."
+            }
+          ]
+        }
+      }
+    }
+  },
+  "silangkitang": {
+    "name": "Silangkitang",
+    "region": "North Sumatra",
+    "features": {
+      "f4": {
+        "fluidModel": {
+          "evidence": "quoted",
+          "source": "Simatupang, Matsuda & Astra (2020), Proceedings World Geothermal Congress — Fig. 15 & Conclusion",
+          "confidence": "A",
+          "scopeNote": "SIL is one of two producing fields in the Sarulla Complex. Namora-I-Langit (NIL), the other field, is a volcanic hydrothermal system with distributed permeability — geologically distinct from SIL's fault-controlled system. This model applies to SIL only.",
+          "note": "Inequalities are ordinal, not magnitudes. Hover panels must not imply numeric values unless sourced separately (e.g. Simatupang 2020, Fig. 8 enthalpy–chloride cross-plot).",
+          "fluids": {
+            "RB": {
+              "name": "Reservoir Brine (RB)",
+              "role": "upflow, high temperature",
+              "detail": "High H, high NCG, higher Cl, low Mg, low HCO₃. Upflow zone along the Great Sumatra Fault, T > 280°C."
+            },
+            "IL": {
+              "name": "Injectate Liquid (IL)",
+              "role": "returning from injection pads",
+              "detail": "Low H, higher HCO₃, low NCG. Returns from SIL 2 / SIL 3 injection pads; breakthrough detected within 2 years of production."
+            },
+            "MR": {
+              "name": "Marginal Recharge (MR)",
+              "role": "cold lateral intrusion",
+              "detail": "Low H, low Cl, high Mg, heavier δ¹⁸O. Cold lateral intrusion — not yet detected in 2-year monitoring (Mg stayed < 0.01 ppm at all wells)."
+            }
+          },
+          "relations": [
+            {
+              "expr": "H(RB) > H(IL) > H(MR)",
+              "fluids": [
+                "RB",
+                "IL",
+                "MR"
+              ],
+              "meaning": "Enthalpy — brine is hottest, recharge coldest"
+            },
+            {
+              "expr": "NCG(RB) > NCG(IL)",
+              "fluids": [
+                "RB",
+                "IL"
+              ],
+              "meaning": "Non-condensable gas — depleted in returning injectate"
+            },
+            {
+              "expr": "HCO₃(RB) < HCO₃(IL)",
+              "fluids": [
+                "RB",
+                "IL"
+              ],
+              "meaning": "Bicarbonate — enriched in injectate, low in brine"
+            },
+            {
+              "expr": "Cl(RB) ≥ Cl(IL) > Cl(MR)",
+              "fluids": [
+                "RB",
+                "IL",
+                "MR"
+              ],
+              "meaning": "Chloride — dilution signature toward the margins"
+            },
+            {
+              "expr": "Mg(RB) < Mg(MR)",
+              "fluids": [
+                "RB",
+                "MR"
+              ],
+              "meaning": "Magnesium — marker for marginal recharge intrusion"
+            }
+          ]
+        },
+        "slicing": {
+          "evidence": "pending",
+          "note": "Silangkitang and Kamojang cross-sections carry no XYZ spatial grid, so there is no dynamic slicing. If arbitrary line slicing ships later, ground it strictly in Salak's UTM grid (Golla 2018) and the 200 m × 200 m block model (Kurniawan 2026) — and first confirm that the grid carries property fields (temperature, chemistry, permeability at nodes), not just mesh geometry."
+        }
+      }
+    }
+  },
+  "kamojang": {
+    "name": "Kamojang",
+    "region": "West Java",
+    "lat": -7.14,
+    "lng": 107.79,
+    "coordinateNote": "Approximate field-level location for the map only — not from LithoHub source papers. Verify before publishing.",
+    "features": {
+      "f3": {
+        "fieldFacts": {
+          "evidence": "quoted",
+          "source": "Abdurachman (2023)",
+          "confidence": "A",
+          "area": "Kawah NE sector",
+          "note": "Framed strictly as a steam-supply depletion indicator (reservoir matrix boiling dry) — no corrosion, HCl, HF or pH terminology appears in this source.",
+          "facts": [
+            {
+              "value": "10 °C",
+              "text": "Steady surface superheat rise since 2017 in the northeastern Kawah Kamojang area."
+            },
+            {
+              "value": "2 °C",
+              "text": "Average surface superheat drop at wells C-1, C-2 and A-2 during the 2-month C-3 pilot injection (2022)."
+            },
+            {
+              "value": "1.5 bar / 15%",
+              "text": "Local pressure drop and steam loss at C-2 in the Waiwera model, from steam-column collapse under continuous central injection."
+            }
+          ]
+        },
+        "corrosionContext": {
+          "evidence": "pending",
+          "note": "Not applicable to Kamojang. Its published gas chemistry is CO₂/H₂S-dominated with nil-to-low chloride — not the HCl/HF profile this tier is built for. For HCl-bearing fields: steam becomes corrosive once the superheat margin drops below 24 °C; with NH₃ present that threshold rises to about 10 °C. Confirm the measurement basis (surface vs bulk superheat) before using these thresholds.",
+          "thresholdsSourceNote": "The 24 °C / 10 °C thresholds are carried over from the prototype without a named source in the panel — add the citation before using them."
+        },
+        "rejectedRule": {
+          "evidence": "derived",
+          "text": "Fixed cutoff \"ΔT > 5 °C = critical danger / corrosion risk\" was dropped: unsupported by Abdurachman (2023) and directionally backwards — rising superheat widens the margin, the opposite of the acid-condensation risk direction. Kept only as an audit record."
+        },
+        "mitigation": {
+          "evidence": "derived",
+          "source": "Acuña (2008); Kurniawan",
+          "text": "Cyclic / edgefield realignment: move injection toward the field periphery rather than continuous central infield injection, to avoid steam-column collapse — the core logic of Salak's SIRP. Applied here as an analogous strategy, not a conclusion Abdurachman (2023) reaches for Kamojang. Salak and Kamojang reservoir characteristics have not been confirmed equivalent — an untested transfer."
+        },
+        "openItems": {
+          "items": [
+            "The corrosion tier assumes Kamojang gas chemistry (CO₂/H₂S-dominated, nil-to-low chloride) — needs a direct 2017–2023 chloride/HCl time series to confirm or rule out.",
+            "The 2 °C pilot-test drop has no stated control well or period — treat it as associated with, not proven caused by, the C-3 injection until confounds (rainfall, production-rate changes) are excluded.",
+            "Surface vs bulk superheat measurement basis must be confirmed consistent before comparing values near the 0 °C margin.",
+            "The mitigation transfer from Salak assumes reservoir-type equivalence not yet verified for Kamojang."
+          ]
+        }
+      }
+    }
+  },
+  "ulubelu": {
+    "name": "Ulubelu",
+    "region": "Lampung",
+    "features": {}
+  }
+}
