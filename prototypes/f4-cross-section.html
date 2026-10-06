@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fitur 4 — Integrated Cross-Section Generator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#12171a;
+    --bg-panel:#1a2124;
+    --bg-panel-2:#1f282b;
+    --stratum:#212a2d;
+    --line:#324044;
+    --line-soft:#263033;
+    --text:#e9e5da;
+    --text-dim:#9aa6a9;
+    --text-faint:#647074;
+    --rb:#c9502f;
+    --rb-soft:#e08a52;
+    --il:#8b98a0;
+    --mr:#4f93c4;
+    --fault-a:#d9a441;
+    --fault-b:#d9a441;
+    --tier-a:#5c9d6c;
+    --tier-b:#c99a3e;
+    --serif: 'Source Serif 4', Georgia, serif;
+    --sans: 'Inter', -apple-system, sans-serif;
+    --mono: 'JetBrains Mono', 'SF Mono', monospace;
+  }
+  :root:not([data-theme="light"]){ color-scheme: dark; }
+  @media (prefers-color-scheme: light){
+    :root:not([data-theme="dark"]){
+      --bg:#f2efe7; --bg-panel:#ffffff; --bg-panel-2:#f7f5ef;
+      --stratum:#eae5d8; --line:#d8d2c2; --line-soft:#e5e0d2;
+      --text:#20211f; --text-dim:#5a5e58; --text-faint:#8a8d86;
+      --il:#6b7378;
+    }
+  }
+  :root[data-theme="light"]{
+    --bg:#f2efe7; --bg-panel:#ffffff; --bg-panel-2:#f7f5ef;
+    --stratum:#eae5d8; --line:#d8d2c2; --line-soft:#e5e0d2;
+    --text:#20211f; --text-dim:#5a5e58; --text-faint:#8a8d86;
+    --il:#6b7378;
+  }
+
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; background:var(--bg); }
+  body{
+    font-family:var(--sans);
+    color:var(--text);
+    line-height:1.5;
+    padding:0 0 64px;
+  }
+  .wrap{ max-width:920px; margin:0 auto; padding:0 24px; }
+
+  /* ---- header ---- */
+  header.page{
+    padding:56px 0 40px;
+    border-bottom:1px solid var(--line-soft);
+    margin-bottom:40px;
+  }
+  .kicker{
+    font-family:var(--mono);
+    font-size:12.5px;
+    color:var(--text-faint);
+    letter-spacing:.02em;
+    margin-bottom:14px;
+  }
+  h1{
+    font-family:var(--serif);
+    font-weight:600;
+    font-size:38px;
+    line-height:1.15;
+    margin:0 0 14px;
+    max-width:14ch;
+  }
+  .lede{
+    font-size:16.5px;
+    color:var(--text-dim);
+    max-width:56ch;
+    margin:0;
+  }
+
+  /* ---- tier badges ---- */
+  .tier{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    font-family:var(--mono);
+    font-size:11.5px;
+    padding:3px 9px 3px 7px;
+    border-radius:3px;
+    border:1px solid currentColor;
+  }
+  .tier.a{ color:var(--tier-a); }
+  .tier.b{ color:var(--tier-b); }
+  .tier-dot{ width:6px; height:6px; border-radius:50%; background:currentColor; flex:none; }
+
+  /* ---- section ---- */
+  section.field{ margin-bottom:64px; }
+  .field-head{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    gap:16px;
+    margin-bottom:6px;
+    flex-wrap:wrap;
+  }
+  h2{
+    font-family:var(--serif);
+    font-weight:600;
+    font-size:24px;
+    margin:0;
+  }
+  .field-sub{
+    color:var(--text-dim);
+    font-size:14.5px;
+    margin:0 0 22px;
+    max-width:64ch;
+  }
+  .scope-note{
+    background:var(--bg-panel-2);
+    border:1px solid var(--line-soft);
+    border-left:3px solid var(--mr);
+    padding:10px 14px;
+    font-size:13.5px;
+    color:var(--text-dim);
+    border-radius:0 4px 4px 0;
+    margin-bottom:22px;
+  }
+  .scope-note b{ color:var(--text); font-weight:600; }
+
+  .panel{
+    background:var(--bg-panel);
+    border:1px solid var(--line-soft);
+    border-radius:8px;
+    padding:20px;
+  }
+
+  /* ---- cross section svg ---- */
+  .xsec-wrap{ position:relative; }
+  svg.xsec{ width:100%; height:auto; display:block; }
+  .well-label{
+    font-family:var(--mono);
+    font-size:10.5px;
+    fill:var(--text-dim);
+  }
+  .axis-label{
+    font-family:var(--mono);
+    font-size:10px;
+    fill:var(--text-faint);
+  }
+  .hover-target{ cursor:pointer; }
+  .fluid-tag{
+    font-family:var(--sans);
+    font-weight:600;
+    font-size:11px;
+  }
+
+  /* legend row under diagrams */
+  .legend-row{
+    display:flex;
+    gap:22px;
+    flex-wrap:wrap;
+    margin-top:16px;
+    padding-top:14px;
+    border-top:1px solid var(--line-soft);
+  }
+  .legend-item{
+    display:flex;
+    align-items:center;
+    gap:7px;
+    font-size:12.5px;
+    color:var(--text-dim);
+    cursor:default;
+  }
+  .swatch{ width:14px; height:3px; border-radius:2px; flex:none; }
+  .swatch.dot{ width:9px; height:9px; border-radius:50%; }
+
+  /* ---- inequality table ---- */
+  .ineq-table{
+    width:100%;
+    border-collapse:collapse;
+    margin-top:18px;
+    font-size:14px;
+  }
+  .ineq-table td{
+    padding:10px 4px;
+    border-top:1px solid var(--line-soft);
+    vertical-align:middle;
+  }
+  .ineq-table tr:first-child td{ border-top:none; }
+  .ineq-expr{
+    font-family:var(--mono);
+    font-size:14.5px;
+    white-space:nowrap;
+    width:1%;
+  }
+  .ineq-desc{ color:var(--text-dim); padding-left:20px !important; font-size:13.5px; }
+  .ineq-table tr{ transition:background .15s; }
+  .ineq-table tr:hover{ background:var(--bg-panel-2); }
+  .ineq-table tr:hover .ineq-desc{ color:var(--text); }
+
+  /* ---- tooltip ---- */
+  .tooltip{
+    position:absolute;
+    pointer-events:none;
+    background:var(--bg-panel-2);
+    border:1px solid var(--line);
+    border-radius:6px;
+    padding:10px 13px;
+    font-size:12.5px;
+    line-height:1.45;
+    max-width:220px;
+    box-shadow:0 8px 24px rgba(0,0,0,.35);
+    opacity:0;
+    transform:translateY(4px);
+    transition:opacity .12s, transform .12s;
+    z-index:10;
+  }
+  .tooltip.show{ opacity:1; transform:translateY(0); }
+  .tooltip .t-title{ font-weight:600; margin-bottom:4px; color:var(--text); }
+  .tooltip .t-body{ color:var(--text-dim); }
+  .tooltip .t-mono{ font-family:var(--mono); color:var(--text); }
+
+  /* ---- caveat box ---- */
+  .caveat{
+    background:var(--bg-panel-2);
+    border:1px solid var(--line-soft);
+    border-left:3px solid var(--tier-b);
+    border-radius:0 6px 6px 0;
+    padding:16px 18px;
+    margin-top:20px;
+    font-size:13.5px;
+    color:var(--text-dim);
+  }
+  .caveat .c-head{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-family:var(--mono);
+    font-size:11.5px;
+    color:var(--tier-b);
+    margin-bottom:8px;
+    text-transform:none;
+  }
+  .caveat p{ margin:0 0 8px; }
+  .caveat p:last-child{ margin-bottom:0; }
+  .caveat b{ color:var(--text); font-weight:600; }
+
+  /* ---- well group table (lahendong) ---- */
+  .well-table{ width:100%; border-collapse:collapse; margin-top:18px; font-size:13.5px; }
+  .well-table th{
+    text-align:left;
+    font-family:var(--mono);
+    font-weight:400;
+    font-size:11px;
+    color:var(--text-faint);
+    padding:0 10px 8px 0;
+    border-bottom:1px solid var(--line-soft);
+  }
+  .well-table td{
+    padding:9px 10px 9px 0;
+    border-bottom:1px solid var(--line-soft);
+    color:var(--text-dim);
+  }
+  .well-table tr:last-child td{ border-bottom:none; }
+  .well-table td.wname{ color:var(--text); font-family:var(--mono); font-weight:500; }
+  .well-table td.num{ font-family:var(--mono); font-size:13px; }
+  .group-chip{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    font-size:12px;
+  }
+  .group-chip .dot{ width:8px; height:8px; border-radius:50%; }
+
+  /* ---- constraints footer ---- */
+  .constraints{
+    margin-top:56px;
+    padding-top:32px;
+    border-top:1px solid var(--line-soft);
+  }
+  .constraints h3{
+    font-family:var(--serif);
+    font-weight:600;
+    font-size:19px;
+    margin:0 0 16px;
+  }
+  .constraint-item{
+    display:grid;
+    grid-template-columns:120px 1fr;
+    gap:16px;
+    padding:14px 0;
+    border-top:1px solid var(--line-soft);
+    font-size:13.5px;
+  }
+  .constraint-item:first-of-type{ border-top:none; }
+  .c-label{
+    font-family:var(--mono);
+    font-size:11.5px;
+    color:var(--text-faint);
+    padding-top:2px;
+  }
+  .c-body{ color:var(--text-dim); }
+  .c-body b{ color:var(--text); font-weight:600; }
+
+  footer.src{
+    margin-top:48px;
+    padding-top:24px;
+    border-top:1px solid var(--line-soft);
+    font-family:var(--mono);
+    font-size:11.5px;
+    color:var(--text-faint);
+    line-height:1.8;
+  }
+
+  @media (max-width:640px){
+    h1{ font-size:29px; }
+    .field-head{ flex-direction:column; align-items:flex-start; }
+    .constraint-item{ grid-template-columns:1fr; gap:6px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="page">
+    <div class="kicker">FITUR 4 — CROSS-SECTION GENERATOR / VERIFIED SOURCE DATA</div>
+    <h1>Integrated Cross-Section Generator</h1>
+    <p class="lede">Static hydrogeochemical cross-section panels with verified fluid-ranking data. No dynamic 3D slicing engine — hover the diagrams for sourced chemistry and well behavior.</p>
+  </header>
+
+  <!-- ============ SILANGKITANG ============ -->
+  <section class="field" id="sil">
+    <div class="field-head">
+      <h2>Silangkitang (SIL), Sarulla Complex</h2>
+      <span class="tier a"><span class="tier-dot"></span>TIER A — VERIFIED</span>
+    </div>
+    <p class="field-sub">Simatupang, Matsuda &amp; Astra (2020), Proceedings World Geothermal Congress — Fig. 15 &amp; Conclusion.</p>
+
+    <div class="scope-note">
+      <b>Scope note.</b> SIL is one of two producing fields in the Sarulla Complex. Namora-I-Langit (NIL), the other field, is a volcanic hydrothermal system with distributed permeability — geologically distinct from SIL's fault-controlled system. This model applies to SIL only.
+    </div>
+
+    <div class="panel">
+      <div class="xsec-wrap" id="sil-wrap">
+        <svg class="xsec" viewBox="0 0 860 380" id="sil-svg">
+          <!-- surface -->
+          <line x1="20" y1="60" x2="840" y2="60" stroke="var(--line)" stroke-width="1.5"/>
+          <text x="20" y="46" class="axis-label">SURFACE</text>
+          <text x="20" y="72" class="axis-label">A</text>
+          <text x="808" y="72" class="axis-label">A'</text>
+
+          <!-- strata bands -->
+          <rect x="20" y="60" width="820" height="90" fill="var(--stratum)" opacity="0.5"/>
+          <rect x="20" y="150" width="820" height="90" fill="var(--stratum)" opacity="0.3"/>
+          <rect x="20" y="240" width="820" height="100" fill="var(--stratum)" opacity="0.15"/>
+
+          <!-- fault trace (GSF) -->
+          <line x1="440" y1="60" x2="440" y2="340" stroke="var(--fault-a)" stroke-width="1.2" stroke-dasharray="3 4" opacity="0.55"/>
+          <text x="446" y="335" class="axis-label" fill="var(--fault-a)" opacity="0.8">GSF</text>
+
+          <!-- upflow mound -->
+          <ellipse cx="440" cy="320" rx="120" ry="34" fill="var(--rb)" opacity="0.22"/>
+
+          <!-- wells -->
+          <g>
+            <line x1="220" y1="60" x2="220" y2="210" stroke="var(--il)" stroke-width="2"/>
+            <text x="220" y="222" class="well-label" text-anchor="middle">SIL 2</text>
+          </g>
+          <g>
+            <line x1="400" y1="60" x2="400" y2="300" stroke="var(--rb-soft)" stroke-width="2.2"/>
+            <text x="400" y="312" class="well-label" text-anchor="middle">SIL 1</text>
+          </g>
+          <g>
+            <line x1="455" y1="60" x2="455" y2="315" stroke="var(--rb)" stroke-width="2.4"/>
+            <text x="455" y="327" class="well-label" text-anchor="middle">SIL 1'</text>
+          </g>
+          <g>
+            <line x1="660" y1="60" x2="660" y2="240" stroke="var(--il)" stroke-width="2"/>
+            <text x="660" y="252" class="well-label" text-anchor="middle">SIL 3</text>
+          </g>
+
+          <!-- RB arrows (upward, red/orange/yellow) -->
+          <path d="M420,320 L420,120" stroke="var(--rb)" stroke-width="3" fill="none" marker-end="url(#arrRB)" class="hover-target" data-fluid="RB"/>
+          <path d="M455,318 L455,105" stroke="var(--rb-soft)" stroke-width="3" fill="none" marker-end="url(#arrRBsoft)" class="hover-target" data-fluid="RB"/>
+          <path d="M485,320 L500,130" stroke="#e8b562" stroke-width="2.6" fill="none" marker-end="url(#arrRByellow)" class="hover-target" data-fluid="RB"/>
+          <text x="470" y="95" class="fluid-tag hover-target" fill="var(--rb)" data-fluid="RB">RB</text>
+
+          <!-- IL arrows (black/slate, from pads inward+down) -->
+          <path d="M220,205 C 280,255 330,275 400,290" stroke="var(--il)" stroke-width="2.2" fill="none" marker-end="url(#arrIL)" class="hover-target" data-fluid="IL"/>
+          <path d="M660,235 C 600,270 540,285 470,295" stroke="var(--il)" stroke-width="2.2" fill="none" marker-end="url(#arrIL)" class="hover-target" data-fluid="IL"/>
+          <text x="300" y="248" class="fluid-tag hover-target" fill="var(--il)" data-fluid="IL">IL</text>
+
+          <!-- MR arrows (blue, from margins) -->
+          <path d="M60,280 C 140,282 190,290 240,300" stroke="var(--mr)" stroke-width="2.2" fill="none" marker-end="url(#arrMR)" class="hover-target" data-fluid="MR"/>
+          <path d="M800,250 C 730,265 670,280 620,295" stroke="var(--mr)" stroke-width="2.2" fill="none" marker-end="url(#arrMR)" class="hover-target" data-fluid="MR"/>
+          <text x="70" y="270" class="fluid-tag hover-target" fill="var(--mr)" data-fluid="MR">MR</text>
+          <text x="740" y="240" class="fluid-tag hover-target" fill="var(--mr)" data-fluid="MR">MR</text>
+
+          <defs>
+            <marker id="arrRB" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="var(--rb)"/></marker>
+            <marker id="arrRBsoft" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="var(--rb-soft)"/></marker>
+            <marker id="arrRByellow" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#e8b562"/></marker>
+            <marker id="arrIL" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="var(--il)"/></marker>
+            <marker id="arrMR" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="var(--mr)"/></marker>
+          </defs>
+        </svg>
+        <div class="tooltip" id="sil-tooltip"></div>
+      </div>
+
+      <div class="legend-row">
+        <div class="legend-item"><span class="swatch" style="background:var(--rb)"></span>Reservoir Brine (RB) — upflow, high temperature</div>
+        <div class="legend-item"><span class="swatch" style="background:var(--il)"></span>Injectate Liquid (IL) — returning from injection pads</div>
+        <div class="legend-item"><span class="swatch" style="background:var(--mr)"></span>Marginal Recharge (MR) — cold lateral intrusion</div>
+      </div>
+
+      <table class="ineq-table" id="sil-ineq">
+        <tbody>
+          <tr data-fluid="RB,IL,MR"><td class="ineq-expr">H<sub>RB</sub> &gt; H<sub>IL</sub> &gt; H<sub>MR</sub></td><td class="ineq-desc">Enthalpy — brine is hottest, recharge coldest</td></tr>
+          <tr data-fluid="RB,IL"><td class="ineq-expr">NCG<sub>RB</sub> &gt; NCG<sub>IL</sub></td><td class="ineq-desc">Non-condensable gas — depleted in returning injectate</td></tr>
+          <tr data-fluid="RB,IL"><td class="ineq-expr">HCO<sub>3,RB</sub> &lt; HCO<sub>3,IL</sub></td><td class="ineq-desc">Bicarbonate — enriched in injectate, low in brine</td></tr>
+          <tr data-fluid="RB,IL,MR"><td class="ineq-expr">Cl<sub>RB</sub> ≥ Cl<sub>IL</sub> &gt; Cl<sub>MR</sub></td><td class="ineq-desc">Chloride — dilution signature toward the margins</td></tr>
+          <tr data-fluid="RB,MR"><td class="ineq-expr">Mg<sub>RB</sub> &lt; Mg<sub>MR</sub></td><td class="ineq-desc">Magnesium — marker for marginal recharge intrusion</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ============ LAHENDONG ============ -->
+  <section class="field" id="lahendong">
+    <div class="field-head">
+      <h2>Lahendong — Southern Reservoir</h2>
+      <span class="tier b"><span class="tier-dot"></span>TIER B — SOURCE-CAVEATED</span>
+    </div>
+    <p class="field-sub">Suherlina, Newson, Kamah &amp; Brehme (2022), Geothermics 105 — Fig. 7, Fig. 16 &amp; Conclusion.</p>
+
+    <div class="panel">
+      <div class="xsec-wrap" id="lhd-wrap">
+        <svg class="xsec" viewBox="0 0 860 360" id="lhd-svg">
+          <!-- fault A: inferred NE-SW, dashed -->
+          <line x1="90" y1="60" x2="560" y2="320" stroke="var(--fault-a)" stroke-width="1.4" stroke-dasharray="5 5" opacity="0.7"/>
+          <text x="95" y="52" class="axis-label" fill="var(--fault-a)">FAULT A · inferred NE–SW strike-slip</text>
+
+          <!-- fault B: proven NW-SE thrust, solid -->
+          <line x1="700" y1="40" x2="330" y2="330" stroke="var(--fault-b)" stroke-width="1.8" opacity="0.85"/>
+          <text x="600" y="55" class="axis-label" fill="var(--fault-b)">FAULT B · proven NW–SE thrust</text>
+
+          <!-- red group: increasing dryness -->
+          <g class="hover-target" data-well="LHD18">
+            <circle cx="230" cy="130" r="9" fill="none" stroke="var(--rb)" stroke-width="2.2"/>
+            <circle cx="230" cy="130" r="3" fill="var(--rb)"/>
+            <text x="230" y="112" class="well-label" text-anchor="middle">LHD 18</text>
+          </g>
+          <g class="hover-target" data-well="LHD15">
+            <circle cx="300" cy="175" r="9" fill="none" stroke="var(--rb)" stroke-width="2.2"/>
+            <circle cx="300" cy="175" r="3" fill="var(--rb)"/>
+            <text x="300" y="157" class="well-label" text-anchor="middle">LHD 15</text>
+          </g>
+          <g class="hover-target" data-well="LHD8">
+            <circle cx="345" cy="222" r="9" fill="none" stroke="var(--rb)" stroke-width="2.2"/>
+            <circle cx="345" cy="222" r="3" fill="var(--rb)"/>
+            <text x="345" y="204" class="well-label" text-anchor="middle">LHD 8</text>
+          </g>
+
+          <!-- green group: stable dryness -->
+          <g class="hover-target" data-well="LHD12">
+            <circle cx="440" cy="255" r="9" fill="none" stroke="var(--tier-a)" stroke-width="2.2"/>
+            <circle cx="440" cy="255" r="3" fill="var(--tier-a)"/>
+            <text x="440" y="237" class="well-label" text-anchor="middle">LHD 12</text>
+          </g>
+          <g class="hover-target" data-well="LHD17">
+            <circle cx="520" cy="290" r="9" fill="none" stroke="var(--tier-a)" stroke-width="2.2"/>
+            <circle cx="520" cy="290" r="3" fill="var(--tier-a)"/>
+            <text x="520" y="272" class="well-label" text-anchor="middle">LHD 17</text>
+          </g>
+
+          <!-- yellow group: decreasing dryness -->
+          <g class="hover-target" data-well="LHD11">
+            <circle cx="405" cy="300" r="9" fill="none" stroke="var(--tier-b)" stroke-width="2.2"/>
+            <circle cx="405" cy="300" r="3" fill="var(--tier-b)"/>
+            <text x="405" y="320" class="well-label" text-anchor="middle">LHD 11</text>
+          </g>
+        </svg>
+        <div class="tooltip" id="lhd-tooltip"></div>
+      </div>
+
+      <div class="legend-row">
+        <div class="legend-item"><span class="swatch dot" style="background:var(--rb)"></span>Increasing dryness — lack of recharge</div>
+        <div class="legend-item"><span class="swatch dot" style="background:var(--tier-a)"></span>Stable dryness — adequate recharge</div>
+        <div class="legend-item"><span class="swatch dot" style="background:var(--tier-b)"></span>Decreasing dryness — strongest fluid inflow</div>
+      </div>
+
+      <table class="well-table">
+        <thead>
+          <tr><th>Well</th><th>Dryness trend</th><th>Cl 2012 → 2018 (mg/l)</th><th>Reading</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="wname">LHD 8</td><td><span class="group-chip"><span class="dot" style="background:var(--rb)"></span>Increasing</span></td><td class="num">347 → 449</td><td>Rising Cl, dropping SO₄ — boiling dry</td></tr>
+          <tr><td class="wname">LHD 15</td><td><span class="group-chip"><span class="dot" style="background:var(--rb)"></span>Increasing</span></td><td class="num">—</td><td>Deeper feed zone, still dries fast</td></tr>
+          <tr><td class="wname">LHD 18</td><td><span class="group-chip"><span class="dot" style="background:var(--rb)"></span>Increasing</span></td><td class="num">—</td><td>Strongest EC / Cl rise in the group</td></tr>
+          <tr><td class="wname">LHD 12</td><td><span class="group-chip"><span class="dot" style="background:var(--tier-a)"></span>Stable</td><td class="num">466 → 355</td><td>Lowered Cl, raised SO₄ — inflow signal</td></tr>
+          <tr><td class="wname">LHD 17</td><td><span class="group-chip"><span class="dot" style="background:var(--tier-a)"></span>Stable</td><td class="num">—</td><td>Turned dry-steam well by Apr 2018</td></tr>
+          <tr><td class="wname">LHD 11</td><td><span class="group-chip"><span class="dot" style="background:var(--tier-b)"></span>Decreasing</td><td class="num">337 → 193</td><td>Deepest feed zone, clearest inflow</td></tr>
+        </tbody>
+      </table>
+
+      <div class="caveat">
+        <div class="c-head">SOURCE CAVEAT — READ BEFORE RENDERING AS FACT</div>
+        <p><b>Fault-to-well proximity is inconsistent within the source itself.</b> The paper's Discussion section places the proven thrust fault (Fault B) "near LHD 12"; its Conclusion instead places Fault B "near LHD 8." This diagram follows the Discussion-section version.</p>
+        <p><b>The general and local framings disagree.</b> At field scale, the paper states NW-SE thrust faults generally <i>admit</i> fluid flow to production wells, while the NE-SW fault (Fault A) is the general barrier. It is only in the local LHD 8/11/12/18 compartmentalization discussion that both faults are jointly treated as barriers — which is what this diagram shows.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ IMPLEMENTATION CONSTRAINTS ============ -->
+  <div class="constraints">
+    <h3>Implementation constraints</h3>
+    <div class="constraint-item">
+      <div class="c-label">NO DYNAMIC SLICING</div>
+      <div class="c-body">Silangkitang and Kamojang cross-sections carry no XYZ spatial grid. Both panels above are pre-digitized static SVGs with hover-driven data — not a slicing engine. <b>Inequalities are ordinal, not magnitude</b>: hover panels must not imply specific numeric values unless sourced separately (e.g. Simatupang 2020, Fig. 8's enthalpy–chloride cross-plot).</div>
+    </div>
+    <div class="constraint-item">
+      <div class="c-label">SALAK ONLY</div>
+      <div class="c-body">If arbitrary line slicing ships in Phase 2, ground it strictly in Salak's UTM grid (Golla 2018) and 200 m × 200 m block model geometry (Kurniawan 2026). Confirm the grid carries actual property fields — temperature, chemistry, permeability at nodes — not just mesh geometry, before committing to this as a deliverable.</div>
+    </div>
+  </div>
+
+  <footer class="src">
+    SOURCES — Simatupang, C., Matsuda, K., Astra, D. (2020). Proceedings World Geothermal Congress, Reykjavík.<br>
+    Suherlina, L., Newson, J., Kamah, Y., Brehme, M. (2022). Geothermics 105, 102510. doi:10.1016/j.geothermics.2022.102510
+  </footer>
+
+</div>
+
+<script>
+(function(){
+  var silData = {
+    RB: { title:"Reservoir Brine (RB)", body:"High H, high NCG, higher Cl, low Mg, low HCO₃. Upflow zone along the Great Sumatra Fault, T > 280°C." },
+    IL: { title:"Injectate Liquid (IL)", body:"Low H, higher HCO₃, low NCG. Returns from SIL 2 / SIL 3 injection pads; breakthrough detected within 2 years of production." },
+    MR: { title:"Marginal Recharge (MR)", body:"Low H, low Cl, high Mg, heavier δ¹⁸O. Cold lateral intrusion — not yet detected in 2-year monitoring (Mg stayed < 0.01 ppm at all wells)." }
+  };
+
+  var silSvg = document.getElementById('sil-svg');
+  var silTip = document.getElementById('sil-tooltip');
+  var silWrap = document.getElementById('sil-wrap');
+
+  silSvg.querySelectorAll('[data-fluid]').forEach(function(el){
+    el.addEventListener('mouseenter', function(e){ showSilTip(el.getAttribute('data-fluid'), e); });
+    el.addEventListener('mousemove', function(e){ positionTip(silTip, silWrap, e); });
+    el.addEventListener('mouseleave', function(){ silTip.classList.remove('show'); });
+  });
+
+  function showSilTip(key, e){
+    var d = silData[key];
+    if(!d) return;
+    silTip.innerHTML = '<div class="t-title">'+d.title+'</div><div class="t-body">'+d.body+'</div>';
+    positionTip(silTip, silWrap, e);
+    silTip.classList.add('show');
+  }
+
+  // inequality table rows highlight matching arrows
+  document.querySelectorAll('#sil-ineq tr').forEach(function(row){
+    row.addEventListener('mouseenter', function(){
+      var fluids = row.getAttribute('data-fluid').split(',');
+      silSvg.querySelectorAll('[data-fluid]').forEach(function(el){
+        if(fluids.indexOf(el.getAttribute('data-fluid')) !== -1){
+          el.style.opacity = '1';
+          el.style.filter = 'drop-shadow(0 0 4px currentColor)';
+        } else {
+          el.style.opacity = '0.25';
+        }
+      });
+    });
+    row.addEventListener('mouseleave', function(){
+      silSvg.querySelectorAll('[data-fluid]').forEach(function(el){
+        el.style.opacity = '1';
+        el.style.filter = 'none';
+      });
+    });
+  });
+
+  var lhdData = {
+    LHD18:{title:"LHD 18 — increasing dryness", body:"Red group. Shallowest feed zone of the enhanced-dryness wells; strongest chloride and EC rise in the cluster."},
+    LHD15:{title:"LHD 15 — increasing dryness", body:"Red group. Deeper feed zone than LHD 8 but still dries fast — depth of feed zone is not the key driver."},
+    LHD8:{title:"LHD 8 — increasing dryness", body:"Red group. Cl 347→449 mg/l (2012–2018), SO₄ falling. Shallowest feed zone; boiling due to pressure drawdown."},
+    LHD12:{title:"LHD 12 — stable dryness", body:"Green group. Cl 466→355 mg/l, SO₄ rising — indicates fluid inflow from the injection site. Acts differently from the drier wells on pH, EC and mass-flow."},
+    LHD17:{title:"LHD 17 — stable dryness", body:"Green group. Turned into a dry-steam well by April 2018 despite the 'stable' classification from the 2013/2015 dataset."},
+    LHD11:{title:"LHD 11 — decreasing dryness", body:"Yellow group. Cl 337→193 mg/l, SO₄ rising — clearest fluid-inflow signal. Deepest feed zone of all sampled wells."}
+  };
+
+  var lhdSvg = document.getElementById('lhd-svg');
+  var lhdTip = document.getElementById('lhd-tooltip');
+  var lhdWrap = document.getElementById('lhd-wrap');
+
+  lhdSvg.querySelectorAll('[data-well]').forEach(function(el){
+    el.addEventListener('mouseenter', function(e){
+      var d = lhdData[el.getAttribute('data-well')];
+      if(!d) return;
+      lhdTip.innerHTML = '<div class="t-title">'+d.title+'</div><div class="t-body">'+d.body+'</div>';
+      positionTip(lhdTip, lhdWrap, e);
+      lhdTip.classList.add('show');
+    });
+    el.addEventListener('mousemove', function(e){ positionTip(lhdTip, lhdWrap, e); });
+    el.addEventListener('mouseleave', function(){ lhdTip.classList.remove('show'); });
+  });
+
+  function positionTip(tip, wrap, e){
+    var rect = wrap.getBoundingClientRect();
+    var x = e.clientX - rect.left + 14;
+    var y = e.clientY - rect.top + 14;
+    if(x + 230 > rect.width) x = e.clientX - rect.left - 234;
+    tip.style.left = x + 'px';
+    tip.style.top = y + 'px';
+  }
+})();
+</script>
+</body>
+</html>

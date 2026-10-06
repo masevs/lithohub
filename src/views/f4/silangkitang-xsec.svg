@@ -1,0 +1,63 @@
+<!-- Drawing copied unchanged from the F4 prototype (schematic). Hover text lives in fields.json. -->
+<svg class="xsec" viewBox="0 0 860 380" id="sil-svg">
+          <!-- surface -->
+          <line x1="20" y1="60" x2="840" y2="60" stroke="var(--line)" stroke-width="1.5"/>
+          <text x="20" y="46" class="axis-label">SURFACE</text>
+          <text x="20" y="72" class="axis-label">A</text>
+          <text x="808" y="72" class="axis-label">A'</text>
+
+          <!-- strata bands -->
+          <rect x="20" y="60" width="820" height="90" fill="var(--stratum)" opacity="0.5"/>
+          <rect x="20" y="150" width="820" height="90" fill="var(--stratum)" opacity="0.3"/>
+          <rect x="20" y="240" width="820" height="100" fill="var(--stratum)" opacity="0.15"/>
+
+          <!-- fault trace (GSF) -->
+          <line x1="440" y1="60" x2="440" y2="340" stroke="var(--fault-a)" stroke-width="1.2" stroke-dasharray="3 4" opacity="0.55"/>
+          <text x="446" y="335" class="axis-label" fill="var(--fault-a)" opacity="0.8">GSF</text>
+
+          <!-- upflow mound -->
+          <ellipse cx="440" cy="320" rx="120" ry="34" fill="var(--rb)" opacity="0.22"/>
+
+          <!-- wells -->
+          <g>
+            <line x1="220" y1="60" x2="220" y2="210" stroke="var(--il)" stroke-width="2"/>
+            <text x="220" y="222" class="well-label" text-anchor="middle">SIL 2</text>
+          </g>
+          <g>
+            <line x1="400" y1="60" x2="400" y2="300" stroke="var(--rb-soft)" stroke-width="2.2"/>
+            <text x="400" y="312" class="well-label" text-anchor="middle">SIL 1</text>
+          </g>
+          <g>
+            <line x1="455" y1="60" x2="455" y2="315" stroke="var(--rb)" stroke-width="2.4"/>
+            <text x="455" y="327" class="well-label" text-anchor="middle">SIL 1'</text>
+          </g>
+          <g>
+            <line x1="660" y1="60" x2="660" y2="240" stroke="var(--il)" stroke-width="2"/>
+            <text x="660" y="252" class="well-label" text-anchor="middle">SIL 3</text>
+          </g>
+
+          <!-- RB arrows (upward, red/orange/yellow) -->
+          <path d="M420,320 L420,120" stroke="var(--rb)" stroke-width="3" fill="none" marker-end="url(#arrRB)" class="hover-target" data-fluid="RB"/>
+          <path d="M455,318 L455,105" stroke="var(--rb-soft)" stroke-width="3" fill="none" marker-end="url(#arrRBsoft)" class="hover-target" data-fluid="RB"/>
+          <path d="M485,320 L500,130" stroke="#e8b562" stroke-width="2.6" fill="none" marker-end="url(#arrRByellow)" class="hover-target" data-fluid="RB"/>
+          <text x="470" y="95" class="fluid-tag hover-target" fill="var(--rb)" data-fluid="RB">RB</text>
+
+          <!-- IL arrows (black/slate, from pads inward+down) -->
+          <path d="M220,205 C 280,255 330,275 400,290" stroke="var(--il)" stroke-width="2.2" fill="none" marker-end="url(#arrIL)" class="hover-target" data-fluid="IL"/>
+          <path d="M660,235 C 600,270 540,285 470,295" stroke="var(--il)" stroke-width="2.2" fill="none" marker-end="url(#arrIL)" class="hover-target" data-fluid="IL"/>
+          <text x="300" y="248" class="fluid-tag hover-target" fill="var(--il)" data-fluid="IL">IL</text>
+
+          <!-- MR arrows (blue, from margins) -->
+          <path d="M60,280 C 140,282 190,290 240,300" stroke="var(--mr)" stroke-width="2.2" fill="none" marker-end="url(#arrMR)" class="hover-target" data-fluid="MR"/>
+          <path d="M800,250 C 730,265 670,280 620,295" stroke="var(--mr)" stroke-width="2.2" fill="none" marker-end="url(#arrMR)" class="hover-target" data-fluid="MR"/>
+          <text x="70" y="270" class="fluid-tag hover-target" fill="var(--mr)" data-fluid="MR">MR</text>
+          <text x="740" y="240" class="fluid-tag hover-target" fill="var(--mr)" data-fluid="MR">MR</text>
+
+          <defs>
+            <marker id="arrRB" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="var(--rb)"/></marker>
+            <marker id="arrRBsoft" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="var(--rb-soft)"/></marker>
+            <marker id="arrRByellow" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#e8b562"/></marker>
+            <marker id="arrIL" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="var(--il)"/></marker>
+            <marker id="arrMR" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="var(--mr)"/></marker>
+          </defs>
+        </svg>

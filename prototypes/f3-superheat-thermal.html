@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fitur 3 — Superheat & Thermal Dynamics</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#12161a; --panel:#1b2026; --panel2:#181d22; --line:#2a313a; --line-soft:#232a31;
+    --text:#e7e3d8; --text-dim:#98a1a9; --text-faint:#6b747c;
+    --amber:#c98a3a; --amber-dim:#7a5a30;
+    --teal:#4e8f86; --teal-dim:#33534d;
+    --red:#b6503f; --red-dim:#6b332a;
+    --focus:#d9c08a;
+  }
+  @media (prefers-color-scheme: light){
+    :root:not([data-theme="dark"]){
+      --bg:#12161a; --panel:#1b2026; --panel2:#181d22; --line:#2a313a; --line-soft:#232a31;
+      --text:#e7e3d8; --text-dim:#98a1a9; --text-faint:#6b747c;
+    }
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg); color:var(--text);
+    font-family:'IBM Plex Sans', -apple-system, Segoe UI, sans-serif;
+    font-size:15px; line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+  .mono{ font-family:'IBM Plex Mono', ui-monospace, Menlo, monospace; }
+
+  .shell{ max-width:1180px; margin:0 auto; padding:36px 24px 80px; }
+
+  header.hero{
+    border-bottom:1px solid var(--line);
+    padding-bottom:28px; margin-bottom:32px;
+    display:flex; flex-wrap:wrap; justify-content:space-between; align-items:flex-end; gap:20px;
+  }
+  header.hero h1{
+    font-size:26px; font-weight:600; margin:0 0 6px; letter-spacing:-0.01em;
+  }
+  header.hero .sub{ color:var(--text-dim); font-size:14px; max-width:56ch; }
+  .field-tag{
+    font-family:'IBM Plex Mono', monospace; font-size:12px; color:var(--text-dim);
+    border:1px solid var(--line); padding:6px 10px; white-space:nowrap;
+  }
+
+  .grid{ display:grid; grid-template-columns:300px 1fr; gap:1px; background:var(--line); border:1px solid var(--line); }
+  @media (max-width:860px){ .grid{ grid-template-columns:1fr; } }
+
+  .rail{ background:var(--panel2); padding:22px; }
+  .main{ background:var(--panel2); padding:0; }
+
+  .panel-title{
+    font-size:11px; letter-spacing:0.06em; color:var(--text-faint);
+    text-transform:uppercase; margin:0 0 14px;
+  }
+  .rail .block{ margin-bottom:26px; }
+  .rail label{ display:block; font-size:12.5px; color:var(--text-dim); margin-bottom:6px; }
+  select, input[type="number"], input[type="text"]{
+    width:100%; background:var(--panel); border:1px solid var(--line); color:var(--text);
+    font-family:'IBM Plex Mono', monospace; font-size:13px; padding:8px 9px; outline:none;
+  }
+  select:focus, input:focus{ border-color:var(--focus); }
+  .row2{ display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+
+  table.datatable{ width:100%; border-collapse:collapse; margin-top:8px; }
+  table.datatable th{ text-align:left; font-size:11px; color:var(--text-faint); font-weight:500; padding:4px 4px; border-bottom:1px solid var(--line); }
+  table.datatable td{ padding:3px 2px; }
+  table.datatable input{ padding:5px 6px; font-size:12.5px; }
+  .rowbtn{ background:none; border:1px solid var(--line); color:var(--text-faint); width:26px; height:26px; cursor:pointer; font-family:'IBM Plex Mono',monospace; }
+  .rowbtn:hover{ border-color:var(--red); color:var(--red); }
+  .addrow{ margin-top:8px; background:none; border:1px dashed var(--line); color:var(--text-dim); font-size:12px; padding:7px 10px; cursor:pointer; width:100%; }
+  .addrow:hover{ border-color:var(--text-dim); color:var(--text); }
+  .recalc{
+    margin-top:6px; width:100%; background:var(--amber-dim); border:1px solid var(--amber);
+    color:#f2e2c8; font-family:'IBM Plex Mono',monospace; font-size:13px; padding:10px; cursor:pointer;
+  }
+  .recalc:hover{ background:var(--amber); color:#1b1204; }
+
+  .note{ font-size:12px; color:var(--text-faint); margin-top:6px; }
+
+  .tier{ padding:26px 28px; border-bottom:1px solid var(--line); }
+  .tier:last-child{ border-bottom:none; }
+  .tier-head{ display:flex; align-items:baseline; gap:12px; margin-bottom:14px; }
+  .tier-badge{
+    font-family:'IBM Plex Mono', monospace; font-size:12px; color:var(--text-faint);
+    border:1px solid var(--line); padding:3px 8px; flex-shrink:0;
+  }
+  .tier-name{ font-size:15px; font-weight:600; }
+  .tier-status{ font-family:'IBM Plex Mono',monospace; font-size:11.5px; margin-left:auto; padding:3px 8px; border:1px solid; white-space:nowrap; }
+  .status-verified{ color:var(--teal); border-color:var(--teal-dim); }
+  .status-conditional{ color:var(--amber); border-color:var(--amber-dim); }
+  .status-dropped{ color:var(--text-faint); border-color:var(--line); text-decoration:line-through; }
+  .status-flagged{ color:var(--red); border-color:var(--red-dim); }
+
+  .chart-wrap{ padding:28px; border-bottom:1px solid var(--line); }
+  .chart-caption{ font-size:12px; color:var(--text-faint); margin-top:10px; max-width:70ch; }
+  svg text{ font-family:'IBM Plex Mono', monospace; }
+
+  .flag-readout{
+    display:flex; gap:22px; flex-wrap:wrap; margin:14px 0 4px;
+  }
+  .stat{ min-width:120px; }
+  .stat .k{ font-size:11px; color:var(--text-faint); text-transform:uppercase; letter-spacing:0.04em; }
+  .stat .v{ font-family:'IBM Plex Mono',monospace; font-size:20px; margin-top:2px; }
+
+  .facts{ list-style:none; margin:0; padding:0; display:grid; gap:10px; }
+  .facts li{ display:flex; gap:12px; align-items:baseline; font-size:13.5px; }
+  .facts .num{ font-family:'IBM Plex Mono',monospace; color:var(--amber); min-width:64px; font-size:13px; }
+  .facts .src{ color:var(--text-faint); font-size:11.5px; }
+
+  .toggle-row{ display:flex; align-items:center; gap:10px; margin-bottom:16px; }
+  .toggle{
+    position:relative; width:42px; height:22px; background:var(--panel); border:1px solid var(--line); cursor:pointer; flex-shrink:0;
+  }
+  .toggle .knob{ position:absolute; top:2px; left:2px; width:16px; height:16px; background:var(--text-faint); transition:transform .15s ease, background .15s ease; }
+  .toggle.on{ border-color:var(--amber-dim); }
+  .toggle.on .knob{ transform:translateX(20px); background:var(--amber); }
+
+  .corrosion-gauge{ margin:18px 0; }
+  .gauge-track{ position:relative; height:26px; background:linear-gradient(90deg, var(--red-dim), var(--amber-dim) 42%, var(--teal-dim) 100%); border:1px solid var(--line); }
+  .gauge-marker{ position:absolute; top:-6px; width:2px; height:38px; background:var(--text); }
+  .gauge-labels{ display:flex; justify-content:space-between; font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:var(--text-faint); margin-top:4px; }
+
+  .callout{ border-left:2px solid; padding:10px 14px; font-size:13px; margin-top:14px; }
+  .callout.amber{ border-color:var(--amber); background:rgba(201,138,58,0.06); }
+  .callout.teal{ border-color:var(--teal); background:rgba(78,143,134,0.06); }
+  .callout.dim{ border-color:var(--line); color:var(--text-dim); }
+
+  .strike{ text-decoration:line-through; color:var(--text-faint); }
+
+  footer.audit{ padding:22px 28px; }
+  footer.audit .lbl{ font-size:11px; color:var(--text-faint); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:10px; }
+  footer.audit ul{ margin:0; padding-left:18px; font-size:12px; color:var(--text-dim); }
+  footer.audit li{ margin-bottom:5px; }
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <header class="hero">
+    <div>
+      <h1>Fitur 3 — Superheat &amp; Thermal Dynamics</h1>
+      <div class="sub">Diagnostic panel for well-pad superheat trend flagging and conditional corrosion-risk context. Depletion signal and corrosion narrative are tracked as separate, independently gated tiers.</div>
+    </div>
+    <div class="field-tag">FIELD: KAMOJANG · KAWAH NE SECTOR</div>
+  </header>
+
+  <div class="grid">
+    <aside class="rail">
+      <div class="block">
+        <div class="panel-title">Well &amp; series</div>
+        <label for="wellSelect">Well pad</label>
+        <select id="wellSelect"></select>
+        <table class="datatable" id="dataTable">
+          <thead><tr><th>Year</th><th>ΔT superheat (°C)</th><th></th></tr></thead>
+          <tbody id="dataBody"></tbody>
+        </table>
+        <button class="addrow" id="addRow">+ add data point</button>
+        <div class="note">Sample series is an illustrative reconstruction of the reported 2017→2022 upward trend and the 2022 pilot-injection dip — not digitized raw data. Replace with logged values for real use.</div>
+      </div>
+
+      <div class="block">
+        <div class="panel-title">Tier B — rule config</div>
+        <div class="row2">
+          <div>
+            <label for="baselineN">Baseline window (pts)</label>
+            <input type="number" id="baselineN" value="3" min="2" max="6">
+          </div>
+          <div>
+            <label for="threshold">Flag threshold (°C)</label>
+            <input type="number" id="threshold" value="3" min="0.5" step="0.5">
+          </div>
+        </div>
+        <label for="minRun" style="margin-top:10px;">Min. consecutive points to flag</label>
+        <input type="number" id="minRun" value="3" min="1" max="6">
+        <button class="recalc" id="recalc">Recompute diagnostic</button>
+        <div class="note">Rule fires only on sustained deviation above the well's own historical baseline — no fixed global cutoff (Tier E was dropped for using one).</div>
+      </div>
+
+      <div class="block">
+        <div class="panel-title">Tier C — gas chemistry</div>
+        <div class="toggle-row">
+          <div class="toggle" id="hclToggle"><div class="knob"></div></div>
+          <label style="margin:0;" id="hclLabel">Simulate HCl/HF-bearing field</label>
+        </div>
+        <div class="note">Default reflects Kamojang: CO₂/H₂S-dominated gas, nil-to-low chloride. Toggle on only to preview how the module behaves for a field like Sonoma or The Geysers.</div>
+      </div>
+    </aside>
+
+    <main class="main">
+
+      <div class="chart-wrap">
+        <div class="panel-title">Surface superheat trend vs. own-baseline</div>
+        <div id="chartHost"></div>
+        <div class="flag-readout" id="statRow"></div>
+        <div class="chart-caption" id="chartCaption"></div>
+      </div>
+
+      <!-- TIER A -->
+      <div class="tier">
+        <div class="tier-head">
+          <span class="tier-badge">TIER A</span>
+          <span class="tier-name">Kamojang field data — Abdurachman 2023</span>
+          <span class="tier-status status-verified">Verified</span>
+        </div>
+        <ul class="facts">
+          <li><span class="num">10 °C</span><span>Steady surface superheat rise since 2017 in the northeastern Kawah Kamojang area.</span></li>
+          <li><span class="num">2 °C</span><span>Average surface superheat drop at wells C-1, C-2, A-2 during the 2-month C-3 pilot injection (2022).</span></li>
+          <li><span class="num">1.5 bar / 15%</span><span>Local pressure drop and steam loss at C-2 in the Waiwera model, from steam-column collapse under continuous central injection.</span></li>
+        </ul>
+        <div class="callout teal">Framed strictly as a steam-supply depletion indicator (reservoir matrix boiling dry) — no corrosion, HCl, HF, or pH terminology appears in this source.</div>
+      </div>
+
+      <!-- TIER B -->
+      <div class="tier">
+        <div class="tier-head">
+          <span class="tier-badge">TIER B</span>
+          <span class="tier-name">Depletion flag — rule engine output</span>
+          <span class="tier-status" id="tierBStatus">—</span>
+        </div>
+        <p id="tierBText" style="margin:0 0 6px; font-size:13.5px; color:var(--text-dim);"></p>
+        <div class="note">Because baseline superheat varies by well pad, the rule checks deviation from that pad's own history — never an absolute degree cutoff.</div>
+      </div>
+
+      <!-- TIER C -->
+      <div class="tier">
+        <div class="tier-head">
+          <span class="tier-badge">TIER C</span>
+          <span class="tier-name">Corrosion risk context</span>
+          <span class="tier-status" id="tierCStatus">Not applicable</span>
+        </div>
+        <div id="tierCBody"></div>
+      </div>
+
+      <!-- TIER E -->
+      <div class="tier">
+        <div class="tier-head">
+          <span class="tier-badge">TIER E</span>
+          <span class="tier-name strike">Fixed cutoff: ΔT &gt; 5 °C = critical danger / corrosion risk</span>
+          <span class="tier-status status-dropped">Dropped</span>
+        </div>
+        <div class="callout dim">Unsupported by Abdurachman 2023 and directionally backwards: rising superheat means the margin is widening, which is the opposite of the acid-condensation risk direction. Kept here only as an audit record of a rejected rule.</div>
+      </div>
+
+      <!-- MITIGATION -->
+      <div class="tier">
+        <div class="tier-head">
+          <span class="tier-badge">MITIGATION</span>
+          <span class="tier-name">Cyclic / edgefield realignment</span>
+          <span class="tier-status status-conditional">Borrowed strategy</span>
+        </div>
+        <p style="margin:0 0 8px; font-size:13.5px; color:var(--text-dim);">Move injection toward the field periphery rather than continuous central infield injection, to avoid steam-column collapse — the core logic of Salak's SIRP (Acuña 2008; Kurniawan).</p>
+        <div class="callout amber">Applied here as an analogous strategy, not a conclusion Abdurachman 2023 itself reaches for Kamojang. Salak and Kamojang reservoir characteristics have not been confirmed equivalent — treat as an untested transfer until checked.</div>
+      </div>
+
+      <footer class="audit">
+        <div class="lbl">Audit trail — open items</div>
+        <ul>
+          <li>Tier C default assumes Kamojang gas chemistry (CO₂/H₂S-dominated, nil-to-low chloride per published field characterizations) — needs a direct time-series chloride/HCl check over 2017–2023 to fully confirm or rule out.</li>
+          <li>Tier A's 2°C pilot-test drop has no stated control well/period in this panel — treat as associated with, not proven caused by, the C-3 injection until confounds (rainfall, production-rate changes) are excluded.</li>
+          <li>Surface-superheat vs. bulk-superheat measurement basis should be confirmed consistent between the Kamojang data and any Tier C threshold source before comparing values near the 0°C margin.</li>
+          <li>Mitigation transfer from Salak assumes reservoir-type equivalence not yet verified for Kamojang.</li>
+        </ul>
+      </footer>
+
+    </main>
+  </div>
+</div>
+
+<script>
+(function(){
+  var WELLS = {
+    "C-1 (near C-3)": [
+      {y:2017, v:0.5},{y:2018, v:1.2},{y:2019, v:2.6},{y:2020, v:4.8},
+      {y:2021, v:7.1},{y:2022, v:9.6},{y:"2022 (post-pilot)", v:7.6},{y:2023, v:8.3}
+    ],
+    "C-2 (near C-3)": [
+      {y:2017, v:0.3},{y:2018, v:1.0},{y:2019, v:2.2},{y:2020, v:4.1},
+      {y:2021, v:6.4},{y:2022, v:8.9},{y:"2022 (post-pilot)", v:6.9},{y:2023, v:7.5}
+    ],
+    "A-2 (near C-3)": [
+      {y:2017, v:0.6},{y:2018, v:1.4},{y:2019, v:2.9},{y:2020, v:5.0},
+      {y:2021, v:7.4},{y:2022, v:10.0},{y:"2022 (post-pilot)", v:8.0},{y:2023, v:8.6}
+    ]
+  };
+
+  var wellSelect = document.getElementById('wellSelect');
+  var dataBody = document.getElementById('dataBody');
+  Object.keys(WELLS).forEach(function(name){
+    var o = document.createElement('option'); o.value = name; o.textContent = name;
+    wellSelect.appendChild(o);
+  });
+
+  function loadWell(name){
+    dataBody.innerHTML = '';
+    WELLS[name].forEach(function(pt, i){ addRow(pt.y, pt.v); });
+  }
+
+  function addRow(y, v){
+    var tr = document.createElement('tr');
+    tr.innerHTML =
+      '<td><input type="text" class="mono yr" value="'+ (y===undefined?'':y) +'"></td>'+
+      '<td><input type="number" step="0.1" class="mono val" value="'+ (v===undefined?'':v) +'"></td>'+
+      '<td><button class="rowbtn">×</button></td>';
+    tr.querySelector('.rowbtn').addEventListener('click', function(){ tr.remove(); });
+    dataBody.appendChild(tr);
+  }
+
+  document.getElementById('addRow').addEventListener('click', function(){ addRow('', ''); });
+  wellSelect.addEventListener('change', function(){ loadWell(wellSelect.value); compute(); });
+
+  // Tier C toggle
+  var hclOn = false;
+  var toggle = document.getElementById('hclToggle');
+  toggle.addEventListener('click', function(){
+    hclOn = !hclOn;
+    toggle.classList.toggle('on', hclOn);
+    renderTierC();
+  });
+
+  function readSeries(){
+    var rows = dataBody.querySelectorAll('tr');
+    var series = [];
+    rows.forEach(function(r){
+      var y = r.querySelector('.yr').value;
+      var v = parseFloat(r.querySelector('.val').value);
+      if(!isNaN(v)) series.push({y:y, v:v});
+    });
+    return series;
+  }
+
+  function renderChart(series, baselineMean, threshold, flagIdxStart){
+    var host = document.getElementById('chartHost');
+    var W = 900, H = 260, padL = 46, padR = 20, padT = 18, padB = 34;
+    var vals = series.map(function(p){return p.v;});
+    var min = Math.min(0, baselineMean, Math.min.apply(null, vals)) - 1;
+    var max = Math.max(baselineMean + threshold, Math.max.apply(null, vals)) + 1;
+    var innerW = W - padL - padR, innerH = H - padT - padB;
+    function xAt(i){ return padL + (series.length<=1?0: i/(series.length-1))*innerW; }
+    function yAt(v){ return padT + innerH - ((v-min)/(max-min))*innerH; }
+
+    var baselineY = yAt(baselineMean);
+    var flagLineY = yAt(baselineMean+threshold);
+
+    var pathD = series.map(function(p,i){ return (i===0?'M':'L')+xAt(i).toFixed(1)+','+yAt(p.v).toFixed(1); }).join(' ');
+
+    var dots = series.map(function(p,i){
+      var flagged = flagIdxStart>=0 && i>=flagIdxStart;
+      var col = flagged ? 'var(--amber)' : 'var(--text-dim)';
+      return '<circle cx="'+xAt(i).toFixed(1)+'" cy="'+yAt(p.v).toFixed(1)+'" r="3.5" fill="'+col+'" />';
+    }).join('');
+
+    var xlabels = series.map(function(p,i){
+      if(series.length>10 && i%2!==0) return '';
+      return '<text x="'+xAt(i).toFixed(1)+'" y="'+(H-10)+'" font-size="10" fill="var(--text-faint)" text-anchor="middle">'+String(p.y).replace(' (post-pilot)','*')+'</text>';
+    }).join('');
+
+    var svg =
+      '<svg viewBox="0 0 '+W+' '+H+'" width="100%" height="'+H+'" xmlns="http://www.w3.org/2000/svg">' +
+        '<rect x="'+padL+'" y="'+padT+'" width="'+innerW+'" height="'+innerH+'" fill="none" stroke="var(--line-soft)"/>' +
+        '<rect x="'+padL+'" y="'+Math.min(baselineY,flagLineY)+'" width="'+innerW+'" height="'+Math.abs(baselineY-flagLineY)+'" fill="rgba(201,138,58,0.06)"/>' +
+        '<line x1="'+padL+'" y1="'+baselineY+'" x2="'+(padL+innerW)+'" y2="'+baselineY+'" stroke="var(--teal)" stroke-dasharray="4 3" stroke-width="1"/>' +
+        '<text x="'+(padL+innerW-4)+'" y="'+(baselineY-5)+'" font-size="10" fill="var(--teal)" text-anchor="end">baseline '+baselineMean.toFixed(1)+'°C</text>' +
+        '<line x1="'+padL+'" y1="'+flagLineY+'" x2="'+(padL+innerW)+'" y2="'+flagLineY+'" stroke="var(--amber)" stroke-dasharray="2 3" stroke-width="1"/>' +
+        '<text x="'+(padL+innerW-4)+'" y="'+(flagLineY-5)+'" font-size="10" fill="var(--amber)" text-anchor="end">flag threshold +'+threshold+'°C</text>' +
+        '<path d="'+pathD+'" fill="none" stroke="var(--text)" stroke-width="1.6"/>' +
+        dots +
+        xlabels +
+      '</svg>';
+    host.innerHTML = svg;
+  }
+
+  function compute(){
+    var series = readSeries();
+    if(series.length===0) return;
+    var N = Math.max(2, Math.min(parseInt(document.getElementById('baselineN').value)||3, series.length-1));
+    var thresh = parseFloat(document.getElementById('threshold').value)||3;
+    var minRun = Math.max(1, parseInt(document.getElementById('minRun').value)||3);
+
+    var baselinePts = series.slice(0,N).map(function(p){return p.v;});
+    var baselineMean = baselinePts.reduce(function(a,b){return a+b;},0)/baselinePts.length;
+
+    // find longest trailing run above baseline+thresh
+    var run = 0, maxTrailingRun = 0, flagIdxStart = -1;
+    for(var i=series.length-1;i>=0;i--){
+      if(series[i].v > baselineMean+thresh){ run++; } else { break; }
+    }
+    maxTrailingRun = run;
+    var flagged = maxTrailingRun >= minRun;
+    if(flagged) flagIdxStart = series.length - maxTrailingRun;
+
+    renderChart(series, baselineMean, thresh, flagIdxStart);
+
+    var stat = document.getElementById('statRow');
+    var last = series[series.length-1].v;
+    stat.innerHTML =
+      '<div class="stat"><div class="k">Baseline (n='+N+')</div><div class="v">'+baselineMean.toFixed(1)+'°C</div></div>'+
+      '<div class="stat"><div class="k">Latest reading</div><div class="v">'+last.toFixed(1)+'°C</div></div>'+
+      '<div class="stat"><div class="k">Δ vs baseline</div><div class="v">+'+(last-baselineMean).toFixed(1)+'°C</div></div>'+
+      '<div class="stat"><div class="k">Trailing run &gt; threshold</div><div class="v">'+maxTrailingRun+' pt(s)</div></div>';
+
+    document.getElementById('chartCaption').textContent =
+      'Shaded band marks the zone between the well pad\'s own baseline and the configured flag threshold. Amber points are inside a trailing run long enough to trigger Tier B.';
+
+    var tierBStatus = document.getElementById('tierBStatus');
+    var tierBText = document.getElementById('tierBText');
+    if(flagged){
+      tierBStatus.className = 'tier-status status-flagged';
+      tierBStatus.textContent = 'Flagged';
+      tierBText.textContent = 'Sustained upward deviation detected: '+maxTrailingRun+' consecutive point(s) exceed baseline + '+thresh+'°C ('+baselineMean.toFixed(1)+'°C → threshold '+(baselineMean+thresh).toFixed(1)+'°C). Consistent with the Tier A depletion pattern — treat as a steam-supply signal, not a corrosion signal.';
+    } else {
+      tierBStatus.className = 'tier-status status-verified';
+      tierBStatus.textContent = 'Not flagged';
+      tierBText.textContent = 'No sustained deviation above the configured threshold for the required run length. Longest current trailing run: '+maxTrailingRun+' of '+minRun+' required point(s).';
+    }
+
+    renderTierC();
+  }
+
+  function renderTierC(){
+    var body = document.getElementById('tierCBody');
+    var statusEl = document.getElementById('tierCStatus');
+    if(!hclOn){
+      statusEl.className = 'tier-status status-conditional';
+      statusEl.textContent = 'Not applicable — Kamojang';
+      body.innerHTML =
+        '<p style="margin:0 0 6px; font-size:13.5px; color:var(--text-dim);">Kamojang\'s published gas chemistry is CO₂/H₂S-dominated with nil-to-low chloride content — not the HCl/HF profile this module is built for. The corrosion-margin logic below is shown for reference only.</p>'+
+        '<div class="callout amber">This tier stays gated off by default. Flip it on only to see how the module renders for a field where HCl/HF has actually been confirmed (e.g. Sonoma, The Geysers). Turning it on does not mean it applies here.</div>';
+      return;
+    }
+    statusEl.className = 'tier-status status-flagged';
+    statusEl.textContent = 'Simulated — not Kamojang';
+    body.innerHTML =
+      '<p style="margin:0 0 4px; font-size:13.5px; color:var(--text-dim);">HCl-bearing steam becomes corrosive once the superheat margin drops below 24°C; with NH₃ present, that threshold rises to about 10°C. Risk increases as the margin shrinks toward 0°C, where acid condensate first forms.</p>'+
+      '<div class="corrosion-gauge">'+
+        '<div class="gauge-track"><div class="gauge-marker" style="left:58%;"></div></div>'+
+        '<div class="gauge-labels"><span>0°C margin</span><span>10°C (w/ NH₃)</span><span>24°C</span><span>safe →</span></div>'+
+      '</div>'+
+      '<div class="callout dim">Marker position is illustrative, not read from live data. Confirm which measurement basis (surface vs. bulk superheat) this threshold and your field data share before treating the gauge as decision-grade.</div>';
+  }
+
+  document.getElementById('recalc').addEventListener('click', compute);
+
+  loadWell(Object.keys(WELLS)[0]);
+  compute();
+})();
+</script>
+</body>
+</html>

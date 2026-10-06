@@ -1,0 +1,567 @@
+[
+  {
+    "id": "well-004",
+    "name": "Salak Geothermal Well #1",
+    "field": "salak",
+    "type": "Geothermal Well",
+    "latitude": -6.73,
+    "longitude": 106.72,
+    "depth": 1561,
+    "status": "active",
+    "location": "East Awibengkok Sector, Gunung Salak Field, West Java",
+    "operatingSince": "2002-12",
+    "rockType": "Andesitic-Rhyodacite (Volcanic)",
+    "rockTypeNote": "Field-level characterization from regional geology literature; not well-specific core/log data for Well #1",
+    "rockTypeSource": "Stimac et al. (2008), as cited across multiple Salak field geology papers",
+    "subsidenceRisk": null,
+    "currentTemp": null,
+    "currentPressure": null,
+    "currentWHP": null,
+    "vibration": null,
+    "anomalyType": "production_decline",
+    "anomalyDescription": "Decline rate escalated from an 8% baseline to 23% (production interference, early 2005) then 237% (silica scale blockage, late 2006). Confirmed via sinker bar survey; recovered scale sample was 80% amorphous silica at 3730 ft-md. Resolved via mechanical workover, June 2007.",
+    "anomalyDepth": 1137,
+    "baselineWHP": null,
+    "baselineTemp": null,
+    "baselinePressure": null,
+    "historicalData": null,
+    "productionHistory": {
+      "metric": "steam_rate_kph",
+      "unitNote": "Steam rate in kilo-pounds per hour (kph); decline rate in percent per year",
+      "points": [
+        {
+          "date": "Dec 2002",
+          "steamRateKph": 280,
+          "declineRatePercent": 8,
+          "eventLabel": "Well completed — baseline established",
+          "eventDescription": "Well #1 completed at TD 5120 ft-md in the East Awibengkok steam cap reservoir. Initial production 280 kph at a normal decline rate of 8%. This is the well's baseline."
+        },
+        {
+          "date": "2005",
+          "steamRateKph": null,
+          "declineRatePercent": 23,
+          "eventLabel": "Production interference",
+          "eventDescription": "Decline rate rose to 23%. A new production well was drilled into the same reservoir sector and a neighboring well converted from two-phase to dry steam, increasing total field extraction from the East Salak steam cap."
+        },
+        {
+          "date": "2006",
+          "steamRateKph": 190,
+          "declineRatePercent": null,
+          "eventLabel": "Pre-blockage level",
+          "eventDescription": "Steam rate still at 190 kph, the level immediately before the sharp drop described below."
+        },
+        {
+          "date": "2006",
+          "steamRateKph": 90,
+          "declineRatePercent": 237,
+          "eventLabel": "Silica scale blockage confirmed",
+          "eventDescription": "Steam rate dropped from 190 to 90 kph with no change in neighboring wells' extraction rate. Sinker bar survey (2.25\" tool) found a blockage at 3730 ft-md; recovered scale sample was 80% amorphous silica by petrographic analysis."
+        },
+        {
+          "date": "June 2007",
+          "steamRateKph": null,
+          "declineRatePercent": null,
+          "eventLabel": "Workover recovery",
+          "eventDescription": "Mechanical clean-out of scale performed. Production recovered to a level consistent with the well's hydraulic model, confirming the decline was caused exclusively by wellbore scale, not formation-level damage."
+        }
+      ],
+      "digitizedSteamRate": {
+        "note": "Approximate values visually digitized from Figure 4 (Libert & Pasikki, 2010). These are estimates, not exact text-quoted figures like the points above.",
+        "points": [
+          {
+            "yearApprox": 2003,
+            "steamRateKph": 355
+          },
+          {
+            "yearApprox": 2003.3,
+            "steamRateKph": 345
+          },
+          {
+            "yearApprox": 2003.6,
+            "steamRateKph": 310
+          },
+          {
+            "yearApprox": 2004,
+            "steamRateKph": 290
+          },
+          {
+            "yearApprox": 2004.5,
+            "steamRateKph": 285
+          },
+          {
+            "yearApprox": 2005.15,
+            "steamRateKph": 247
+          },
+          {
+            "yearApprox": 2005.9,
+            "steamRateKph": 200
+          },
+          {
+            "yearApprox": 2006.85,
+            "steamRateKph": 90
+          },
+          {
+            "yearApprox": 2008.05,
+            "steamRateKph": 150,
+            "note": "Workover recovery period (circled in original figure)"
+          }
+        ]
+      },
+      "digitizedModelRate": {
+        "note": "Approximate values visually digitized from the green 'Well #1 Model' curve in Figure 4 (Libert & Pasikki, 2010), read at whole-year gridlines. Values at digitizedSteamRate.points' yearApprox are linearly interpolated between these anchors at comparison time — see computeModelDivergence() in index.html.",
+        "points": [
+          {
+            "year": 2003,
+            "modelRateKph": 340
+          },
+          {
+            "year": 2004,
+            "modelRateKph": 320
+          },
+          {
+            "year": 2005,
+            "modelRateKph": 280
+          },
+          {
+            "year": 2006,
+            "modelRateKph": 240
+          },
+          {
+            "year": 2007,
+            "modelRateKph": 220
+          },
+          {
+            "year": 2008,
+            "modelRateKph": 180
+          },
+          {
+            "year": 2009,
+            "modelRateKph": 120
+          },
+          {
+            "year": 2010,
+            "modelRateKph": 80
+          }
+        ]
+      }
+    },
+    "source": "Libert, F. and Pasikki, R. (2010). Identifying Important Reservoir Characteristics Using Calibrated Wellbore Hydraulic Models in the Salak Geothermal Field, Indonesia. Proceedings World Geothermal Congress 2010, Bali."
+  },
+  {
+    "id": "well-005",
+    "name": "Silangkitang Northernmost Production Well",
+    "field": "silangkitang",
+    "type": "Geothermal Well",
+    "latitude": 1.79,
+    "longitude": 99.19,
+    "coordinateNote": "Approximate — derived from field's reported distance (~35 km SE of Tarutung); exact well coordinates not published",
+    "depth": 2165,
+    "depthNote": "Field-level estimate (~2031-2330 m range from 1994-1998 exploration wells); not well-specific depth for this particular production well",
+    "depthSource": "A Natural State Reservoir Modelling of Silangkitang Geothermal Field Using TOUGH-2 Simulator (well depth range); not from Simatupang et al. (2020)",
+    "status": "active",
+    "location": "Silangkitang (SIL) Field, Tapanuli Utara, North Sumatra",
+    "operatingSince": "2017-Q1",
+    "rockType": "Metasediments (Paleozoic)",
+    "rockTypeNote": "Field-level characterization; not well-specific core/log data",
+    "rockTypeSource": "Simatupang, Matsuda & Astra (2020), Section 1 - Introduction",
+    "subsidenceRisk": null,
+    "currentTemp": null,
+    "currentPressure": null,
+    "currentWHP": 689,
+    "currentWHPNote": "Estimated midpoint of field-reported operational range (35–60 barg / ~508–870 psi across all SIL production wells, 7–15% valve opening); not a live reading for this specific well",
+    "currentWHPSource": "Simatupang et al. (2020), Section 4 - Reservoir Response",
+    "vibration": null,
+    "anomalyType": "injection_breakthrough",
+    "anomalyDescription": "Chemical breakthrough detected: NCG and HCO3 declining since injection began (2017), consistent with injectate liquid (low-NCG, low-HCO3) reaching this well from SIL 2 injection pad. Confirmed by tracer test showing 1.59% cumulative mass return from SIL 2 injectors within 4 months. However, no thermal breakthrough detected — enthalpy remains stable and flow rate has increased, attributed to reservoir boiling and sufficient residence time for injectate to reheat before reaching the well.",
+    "anomalyDepth": null,
+    "baselineWHP": null,
+    "baselineTemp": null,
+    "baselinePressure": null,
+    "historicalData": null,
+    "geochemicalHistory": {
+      "metric": "ncg_hco3_enthalpy_flowrate",
+      "unitNote": "NCG in weight %, HCO3 in ppm, enthalpy in kJ/kg, flow rate in tonnes/hour",
+      "dataQuality": "Digitized approximate values from Figure 11(b), Simatupang et al. (2020) — not exact text-quoted figures",
+      "points": [
+        {
+          "date": "Jan 2016",
+          "ncgWtPercent": 0.78,
+          "hco3Ppm": 155,
+          "enthalpyKjKg": 1300,
+          "flowRateTPerHr": 400,
+          "eventLabel": "Pre-breakthrough baseline",
+          "eventDescription": "Early monitoring point shortly after commercial production began (Mar 2017 for full field; this well among initial producers). NCG and HCO3 at reservoir-characteristic levels."
+        },
+        {
+          "date": "Sep 2017",
+          "ncgWtPercent": 0.68,
+          "hco3Ppm": 135,
+          "enthalpyKjKg": 1320,
+          "flowRateTPerHr": 620,
+          "eventLabel": "Early chemical decline",
+          "eventDescription": "NCG and HCO3 trending downward, consistent with early injectate liquid arrival from SIL 2 injection wells to the north."
+        },
+        {
+          "date": "Apr 2018",
+          "ncgWtPercent": 0.58,
+          "hco3Ppm": 118,
+          "enthalpyKjKg": 1350,
+          "flowRateTPerHr": 580,
+          "eventLabel": "Continued chemical breakthrough",
+          "eventDescription": "NCG and HCO3 continuing to decline. Enthalpy remains stable, indicating no thermal impact despite chemical dilution."
+        },
+        {
+          "date": "Oct 2018",
+          "ncgWtPercent": 0.55,
+          "hco3Ppm": 112,
+          "enthalpyKjKg": 1320,
+          "flowRateTPerHr": 630,
+          "eventLabel": "Confirmed chemical breakthrough, no thermal impact",
+          "eventDescription": "NCG and HCO3 at lowest observed levels (~30% decline from baseline). Enthalpy and flow rate both stable-to-increasing, confirming injectate liquid has been sufficiently reheated by reservoir rock (>280°C) before reaching this well."
+        }
+      ]
+    },
+    "source": "Simatupang, C., Matsuda, K. and Astra, D. (2020). The Initial State Geochemical Model and Reservoir Response of 2 Years Production at Silangkitang, a Fault-Controlled Geothermal System along the Great Sumatera Fault. Proceedings World Geothermal Congress 2020, Reykjavik."
+  },
+  {
+    "id": "well-006",
+    "name": "Ulubelu Well",
+    "field": "ulubelu",
+    "type": "Geothermal Well",
+    "latitude": -5.3096,
+    "longitude": 104.5733,
+    "coordinateNote": "Approximate — field-level location (Ulubelu geothermal power plant, Tanggamus, Lampung); not a specific well coordinate",
+    "depth": 1850,
+    "depthEstimateNote": "Not directly reported for any individual well. Estimated midpoint of a derived range (~1600-2100 m), calculated from surface elevation (700-900 masl, Yuniar et al. 2015) minus reservoir zone elevation range (-500 to -1300 masl, Nusantara et al. 2021), assuming vertical well geometry.",
+    "depthEstimateSource": "Derived estimate — based on Yuniar et al. (2015) and Nusantara et al. (2021)",
+    "status": "active",
+    "location": "Ulubelu Geothermal Field, Tanggamus, Lampung",
+    "operatingSince": "2012",
+    "rockType": "Ignimbrite (Altered Rhyolitic Tuff)",
+    "rockTypeNote": "Field-level reservoir rock facies, confirmed present in all wells; not well-specific",
+    "rockTypeSource": "Nusantara et al. (2021), Section 2",
+    "subsidenceRisk": null,
+    "currentTemp": 250,
+    "currentTempNote": "Field-wide average reservoir temperature. Individual wells vary: north sector 270-275°C, south sector 250-260°C (lowest at UBL-8, 253°C).",
+    "currentTempSource": "Yuniar et al. (2015); Mulyanto et al. (2015)",
+    "currentPressure": null,
+    "currentWHP": 176.5,
+    "currentWHPNote": "Estimated average across 3 production clusters, derived from visually estimated per-cluster WHP ranges from Figure 4 (Yuniar et al. 2015): Cluster B 11-16 bar, Cluster C 9-14 bar, Cluster D 10-13 bar. Converted from bar to PSI.",
+    "currentWHPSource": "Derived from Yuniar et al. (2015), Figure 4",
+    "vibration": null,
+    "anomalyType": "casing_leak_cold_influx",
+    "anomalyDescription": "Two unnamed production wells experienced failure to discharge during Ulubelu's first year of operation, caused by shallow casing defects allowing cold water intrusion into the wellbore. Confirmed via downhole PT survey showing temperature decline versus static baseline profile.",
+    "anomalyDepth": null,
+    "baselineWHP": null,
+    "baselineTemp": null,
+    "baselinePressure": null,
+    "historicalData": null,
+    "eventLog": {
+      "note": "Timeline reconstructed from narrative text in Yuniar et al. (2015).",
+      "points": [
+        {
+          "date": "2012",
+          "eventLabel": "Commercial production begins",
+          "eventDescription": "11 production wells across 3 clusters (B, C, D) begin supplying steam to 2 x 55 MWe turbines."
+        },
+        {
+          "date": "2012-2013",
+          "eventLabel": "Wellhead pressure decline observed",
+          "eventDescription": "WHP declined across all 3 production clusters during the first year. Initially considered common transient reservoir response to new production."
+        },
+        {
+          "date": "2012-2013",
+          "eventLabel": "Two wells fail to discharge",
+          "eventDescription": "Two unnamed production wells experienced severe problems preventing discharge, prompting downhole investigation."
+        },
+        {
+          "date": "2012-2013",
+          "eventLabel": "Casing defect confirmed",
+          "eventDescription": "Downhole PT survey and chemical sampling showed temperature decline caused by shallow casing defect allowing cold fluid intrusion — confirmed via comparison to static baseline profile (Fig. 6)."
+        }
+      ]
+    },
+    "ptProfileIllustration": {
+      "note": "Approximate values digitized from Fig. 6 (Yuniar et al. 2015). ",
+      "staticTemperature": {
+        "points": [
+          {
+            "elevationM": 700,
+            "tempC": 20
+          },
+          {
+            "elevationM": 400,
+            "tempC": 20
+          },
+          {
+            "elevationM": 100,
+            "tempC": 60
+          },
+          {
+            "elevationM": 0,
+            "tempC": 150
+          },
+          {
+            "elevationM": -200,
+            "tempC": 200
+          },
+          {
+            "elevationM": -500,
+            "tempC": 225
+          },
+          {
+            "elevationM": -800,
+            "tempC": 275
+          },
+          {
+            "elevationM": -1100,
+            "tempC": 290
+          }
+        ]
+      },
+      "postIntrusion2013": {
+        "points": [
+          {
+            "elevationM": 700,
+            "tempC": 20
+          },
+          {
+            "elevationM": 400,
+            "tempC": 30
+          },
+          {
+            "elevationM": 100,
+            "tempC": 50
+          },
+          {
+            "elevationM": -200,
+            "tempC": 55
+          },
+          {
+            "elevationM": -500,
+            "tempC": 60
+          },
+          {
+            "elevationM": -800,
+            "tempC": 70
+          },
+          {
+            "elevationM": -1100,
+            "tempC": 120
+          }
+        ]
+      }
+    },
+    "source": "Yuniar, D.M., Hastuti, P. and Silaban, M. (2015). Ulubelu, First Year Reservoir Monitoring. WGC 2015, Melbourne. / Mulyanto et al. (2015). The Initial-State Geochemistry as a Baseline for Geochemical Monitoring at Ulubelu Geothermal Field, Indonesia. WGC 2015, Melbourne. / Nusantara, V.D.M. et al. (2021). Reservoir Rock of Ulubelu Geothermal System, Indonesia. WGC 2020+1, Reykjavik."
+  },
+  {
+    "id": "well-007",
+    "name": "Lahendong LHD-8",
+    "field": "lahendong",
+    "type": "Geothermal Well",
+    "latitude": 1.2712,
+    "longitude": 124.8354,
+    "coordinateNote": "Approximate — field-level location (Lahendong geothermal power plant, Tomohon/Tompaso, North Sulawesi);",
+    "depth": 1400,
+    "status": "active",
+    "location": "Lahendong Geothermal Field, Tomohon, North Sulawesi",
+    "rockType": "Andesite-Ignimbritic (Volcanic)",
+    "rockTypeNote": "Field-level lithology from Pre-Tondano, Tondano, and Post-Tondano formations; not well-specific core/log data for LHD-8",
+    "rockTypeSource": "Koestono (2010); Sumintadireja et al. (2001), as cited in Suherlina et al. (2022), Section 2",
+    "subsidenceRisk": null,
+    "currentTemp": 316,
+    "currentTempNote": "Reservoir temperature from 2018 well sampling (Table 3)",
+    "currentTempSource": "Suherlina et al. (2022), Table 3",
+    "currentPressure": null,
+    "currentWHP": null,
+    "pressureNote": "Not reported in source paper for any well, including LHD-8 — no WHP or downhole pressure data is presented",
+    "currentFlowRate": 38.22,
+    "currentFlowRateUnit": "ton/hr",
+    "currentFlowRateNote": "Total mass flow rate, visually read from Fig. 16C (2018 dataset, paired with matching pH/EC values from Table 3)",
+    "currentFlowRateSource": "Suherlina et al. (2022), Fig. 16C",
+    "geochemicalTrend": {
+      "note": "Chloride and sulfate concentrations, 2012 vs 2018 (Table 4).",
+      "points": [
+        {
+          "date": "2012",
+          "clPpm": 347,
+          "so4Ppm": 125
+        },
+        {
+          "date": "2018",
+          "clPpm": 449.08,
+          "so4Ppm": 102.87
+        }
+      ]
+    },
+    "drynessMeasured": {
+      "note": "Visually digitized from Fig. 7A (dryness %) and Fig. 7B (steam/brine flow rate, ton/hr), cross-validated against each other.",
+      "points": [
+        {
+          "year": "2013",
+          "drynessPercent": 80
+        },
+        {
+          "year": "2015",
+          "drynessPercent": 85,
+          "steamFlowRateTonHr": 32,
+          "brineFlowRateTonHr": 5,
+          "drynessCalculated": 86.5
+        }
+      ]
+    },
+    "vibration": null,
+    "anomalyType": "boiling_dryness_increase",
+    "anomalyDescription": "LHD-8 shows an increasing dryness trend (steam fraction)",
+    "anomalyDepth": null,
+    "baselineWHP": null,
+    "baselineTemp": null,
+    "baselinePressure": null,
+    "historicalData": null,
+    "source": "Suherlina, L., Newson, J., Kamah, Y. and Brehme, M. (2022). The dynamic evolution of the Lahendong geothermal system in North-Sulawesi, Indonesia. Geothermics, 105, 102510."
+  },
+  {
+    "id": "kamojang-c-1",
+    "name": "Kamojang well pad C-1 (near C-3)",
+    "field": "kamojang",
+    "type": "Geothermal Well Pad",
+    "latitude": null,
+    "longitude": null,
+    "location": "Kawah NE sector, Kamojang Field, West Java",
+    "superheatSeries": {
+      "evidence": "illustrative",
+      "note": "Illustrative reconstruction of the reported 2017→2022 upward trend and the 2022 pilot-injection dip — NOT digitized raw data. Replace with logged values for real use.",
+      "points": [
+        {
+          "year": "2017",
+          "deltaTC": 0.5
+        },
+        {
+          "year": "2018",
+          "deltaTC": 1.2
+        },
+        {
+          "year": "2019",
+          "deltaTC": 2.6
+        },
+        {
+          "year": "2020",
+          "deltaTC": 4.8
+        },
+        {
+          "year": "2021",
+          "deltaTC": 7.1
+        },
+        {
+          "year": "2022",
+          "deltaTC": 9.6
+        },
+        {
+          "year": "2022 (post-pilot)",
+          "deltaTC": 7.6
+        },
+        {
+          "year": "2023",
+          "deltaTC": 8.3
+        }
+      ]
+    },
+    "source": "Trend shape from Abdurachman (2023); values are illustrative."
+  },
+  {
+    "id": "kamojang-c-2",
+    "name": "Kamojang well pad C-2 (near C-3)",
+    "field": "kamojang",
+    "type": "Geothermal Well Pad",
+    "latitude": null,
+    "longitude": null,
+    "location": "Kawah NE sector, Kamojang Field, West Java",
+    "superheatSeries": {
+      "evidence": "illustrative",
+      "note": "Illustrative reconstruction of the reported 2017→2022 upward trend and the 2022 pilot-injection dip — NOT digitized raw data. Replace with logged values for real use.",
+      "points": [
+        {
+          "year": "2017",
+          "deltaTC": 0.3
+        },
+        {
+          "year": "2018",
+          "deltaTC": 1
+        },
+        {
+          "year": "2019",
+          "deltaTC": 2.2
+        },
+        {
+          "year": "2020",
+          "deltaTC": 4.1
+        },
+        {
+          "year": "2021",
+          "deltaTC": 6.4
+        },
+        {
+          "year": "2022",
+          "deltaTC": 8.9
+        },
+        {
+          "year": "2022 (post-pilot)",
+          "deltaTC": 6.9
+        },
+        {
+          "year": "2023",
+          "deltaTC": 7.5
+        }
+      ]
+    },
+    "source": "Trend shape from Abdurachman (2023); values are illustrative."
+  },
+  {
+    "id": "kamojang-a-2",
+    "name": "Kamojang well pad A-2 (near C-3)",
+    "field": "kamojang",
+    "type": "Geothermal Well Pad",
+    "latitude": null,
+    "longitude": null,
+    "location": "Kawah NE sector, Kamojang Field, West Java",
+    "superheatSeries": {
+      "evidence": "illustrative",
+      "note": "Illustrative reconstruction of the reported 2017→2022 upward trend and the 2022 pilot-injection dip — NOT digitized raw data. Replace with logged values for real use.",
+      "points": [
+        {
+          "year": "2017",
+          "deltaTC": 0.6
+        },
+        {
+          "year": "2018",
+          "deltaTC": 1.4
+        },
+        {
+          "year": "2019",
+          "deltaTC": 2.9
+        },
+        {
+          "year": "2020",
+          "deltaTC": 5
+        },
+        {
+          "year": "2021",
+          "deltaTC": 7.4
+        },
+        {
+          "year": "2022",
+          "deltaTC": 10
+        },
+        {
+          "year": "2022 (post-pilot)",
+          "deltaTC": 8
+        },
+        {
+          "year": "2023",
+          "deltaTC": 8.6
+        }
+      ]
+    },
+    "source": "Trend shape from Abdurachman (2023); values are illustrative."
+  }
+]
